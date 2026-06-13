@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Guitar Theory Trainer</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0f0f0f;--bg2:#1a1a1a;--bg3:#242424;--bg4:#2e2e2e;
+  --border:#333;--border2:#444;
+  --text:#f0f0f0;--text2:#aaa;--text3:#666;
+  --purple:#8b7cf8;--purple-bg:#1e1a3a;--purple-light:#a99ff9;
+  --green:#4ade80;--green-bg:#0d2818;--green-border:#1e5c33;
+  --red:#f87171;--red-bg:#2a0d0d;--red-border:#5c1e1e;
+  --teal:#2dd4bf;--teal-bg:#0d2420;
+  --amber:#fbbf24;
+}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Helvetica Neue',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+
+.app{max-width:760px;margin:0 auto;padding:16px}
+.header{display:flex;align-items:center;gap:14px;padding:20px 0 16px;border-bottom:0.5px solid var(--border);margin-bottom:0}
+.logo{width:40px;height:40px;border-radius:10px;background:var(--purple-bg);border:0.5px solid var(--purple);display:flex;align-items:center;justify-content:center;font-size:20px;color:var(--purple)}
+.header-title{font-size:18px;font-weight:600;color:var(--text)}
+.header-sub{font-size:12px;color:var(--text3);margin-top:2px}
+
+.nav{display:flex;gap:0;background:var(--bg2);border:0.5px solid var(--border);border-radius:10px;padding:4px;margin:16px 0;overflow-x:auto}
+.nav-btn{padding:8px 14px;font-size:13px;font-weight:400;color:var(--text2);border:none;background:none;cursor:pointer;border-radius:7px;transition:all .15s;white-space:nowrap;flex-shrink:0}
+.nav-btn.active{background:var(--bg4);color:var(--text);font-weight:500}
+.nav-btn:hover:not(.active){color:var(--text);background:var(--bg3)}
+
+.sec{display:none;padding:4px 0}.sec.active{display:block}
+
+.mode-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.mode-chip{padding:6px 14px;border:0.5px solid var(--border2);border-radius:20px;font-size:12px;cursor:pointer;background:var(--bg2);color:var(--text2);transition:all .15s}
+.mode-chip.active{background:var(--purple-bg);border-color:var(--purple);color:var(--purple-light);font-weight:500}
+
+.score-row{display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.score-pill{background:var(--bg2);border:0.5px solid var(--border);border-radius:20px;padding:5px 14px;font-size:12px;color:var(--text2)}
+.score-pill strong{color:var(--text);font-weight:500}
+.streak{margin-left:auto;font-size:13px;color:var(--purple);font-weight:500}
+
+.prog-bar{height:2px;background:var(--bg4);border-radius:2px;margin-bottom:16px}
+.prog-fill{height:100%;background:var(--purple);border-radius:2px;transition:width .4s}
+
+.qcard{background:var(--bg2);border:0.5px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:8px}
+.qtop{padding:20px 20px 16px;border-bottom:0.5px solid var(--border)}
+.qlabel{font-size:11px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px}
+.qtext{font-size:19px;font-weight:500;color:var(--text);line-height:1.4}
+.qhint{font-size:13px;color:var(--text3);margin-top:6px}
+
+.choices{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:16px}
+.choice{padding:12px 16px;border:0.5px solid var(--border2);border-radius:8px;font-size:14px;cursor:pointer;background:var(--bg3);color:var(--text);text-align:left;transition:all .15s;line-height:1.3}
+.choice:hover:not([disabled]){background:var(--purple-bg);border-color:var(--purple);color:var(--purple-light)}
+.choice.correct{background:var(--green-bg);border-color:var(--green-border);color:var(--green)}
+.choice.wrong{background:var(--red-bg);border-color:var(--red-border);color:var(--red)}
+.choice[disabled]{cursor:default}
+
+.result-banner{margin:0 16px 10px;padding:13px 16px;border-radius:8px;font-size:13px;line-height:1.6}
+.result-banner.ok{background:var(--green-bg);color:#86efac;border:0.5px solid var(--green-border)}
+.result-banner.ng{background:var(--red-bg);color:#fca5a5;border:0.5px solid var(--red-border)}
+.result-banner .rlabel{font-weight:600;margin-bottom:4px;display:block}
+
+.next-btn{margin:0 16px 16px;padding:10px 20px;border:0.5px solid var(--purple);border-radius:8px;font-size:14px;cursor:pointer;background:var(--purple-bg);color:var(--purple-light);font-weight:500;transition:all .15s}
+.next-btn:hover{background:var(--purple);color:#fff}
+
+.fb-controls{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;align-items:center}
+.fb-controls label{font-size:12px;color:var(--text2)}
+.fb-select{font-size:13px;padding:7px 10px;border:0.5px solid var(--border2);border-radius:8px;background:var(--bg2);color:var(--text);cursor:pointer;outline:none}
+.fb-select:focus{border-color:var(--purple)}
+
+.fb-svg-wrap{background:var(--bg2);border:0.5px solid var(--border);border-radius:12px;padding:16px;overflow-x:auto;margin-bottom:8px}
+.hint-text{font-size:12px;color:var(--text3);margin-top:6px}
+
+.fall-wrap{background:var(--bg2);border:0.5px solid var(--border);border-radius:12px;padding:16px;overflow-x:auto}
+.note-keyboard{display:flex;gap:6px;flex-wrap:wrap;margin-top:14px}
+.nkey{padding:8px 12px;border:0.5px solid var(--border2);border-radius:7px;font-size:13px;font-weight:500;cursor:pointer;background:var(--bg3);color:var(--text);transition:all .15s;min-width:44px;text-align:center}
+.nkey:hover{background:var(--purple-bg);border-color:var(--purple);color:var(--purple-light)}
+.nkey.sharp-key{background:var(--bg4);font-size:11px}
+
+.scale-qcard{background:var(--bg2);border:0.5px solid var(--border);border-radius:12px;overflow:hidden}
+.sbtns{display:flex;gap:8px;flex-wrap:wrap;padding:16px}
+.sbtn{padding:8px 16px;border:0.5px solid var(--border2);border-radius:8px;font-size:14px;font-weight:500;cursor:pointer;background:var(--bg3);color:var(--text);transition:all .15s}
+.sbtn:hover:not([disabled]){background:var(--purple-bg);border-color:var(--purple);color:var(--purple-light)}
+.sbtn.correct{background:var(--green-bg);border-color:var(--green-border);color:var(--green)}
+.sbtn.wrong{background:var(--red-bg);border-color:var(--red-border);color:var(--red)}
+.sbtn.reveal{background:var(--teal-bg);border-color:var(--teal);color:var(--teal)}
+.sbtn[disabled]{cursor:default;opacity:.7}
+
+.ref-card{background:var(--bg2);border:0.5px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:12px}
+.ref-table{width:100%;border-collapse:collapse;font-size:13px}
+.ref-table th{text-align:left;padding:9px 14px;border-bottom:0.5px solid var(--border);color:var(--text3);font-weight:500;font-size:11px;background:var(--bg3);text-transform:uppercase;letter-spacing:.05em}
+.ref-table td{padding:9px 14px;border-bottom:0.5px solid var(--border);color:var(--text)}
+.ref-table tr:last-child td{border-bottom:none}
+.badge{display:inline-block;padding:2px 9px;border-radius:20px;font-size:11px;font-weight:500}
+.bp{background:#1e1a3a;color:#a99ff9}.bt{background:#0d2420;color:#2dd4bf}.ba{background:#2a1f0a;color:#fbbf24}.bc{background:#2a1210;color:#f87171}.bg{background:#0d2818;color:#4ade80}
+
+.key-badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:500;background:var(--purple-bg);color:var(--purple-light);margin-left:8px;vertical-align:middle}
+.info-box{padding:10px 14px;background:var(--bg3);border-radius:8px;border-left:2px solid var(--purple);margin-bottom:12px;font-size:13px;color:var(--text2)}
+
+@media(max-width:600px){.choices{grid-template-columns:1fr}.header-title{font-size:15px}}
+</style>
+</head>
+<body>
+<div class="app">
+<div class="header">
+  <div class="logo"><i class="ti ti-music"></i></div>
+  <div>
+    <div class="header-title">Guitar Theory Trainer</div>
+    <div class="header-sub">音名 · 指板 · インターバル · スケール · コード</div>
+  </div>
+</div>
+
+<div class="nav">
+  <button class="nav-btn active" onclick="switchTab('quiz',this)">クイズ</button>
+  <button class="nav-btn" onclick="switchTab('fret-all',this)">指板完全入力</button>
+  <button class="nav-btn" onclick="switchTab('scale-q',this)">スケールクイズ</button>
+  <button class="nav-btn" onclick="switchTab('fbmap',this)">指板マップ</button>
+  <button class="nav-btn" onclick="switchTab('ref',this)">リファレンス</button>
+</div>
+
+<!-- QUIZ -->
+<div id="sec-quiz" class="sec active">
+  <div class="mode-row">
+    <button class="mode-chip active" onclick="setMode('notename',this)">音名・英語</button>
+    <button class="mode-chip" onclick="setMode('fret',this)">指板の音</button>
+    <button class="mode-chip" onclick="setMode('interval',this)">インターバル</button>
+    <button class="mode-chip" onclick="setMode('chord',this)">コード</button>
+    <button class="mode-chip" onclick="setMode('scale',this)">スケール</button>
+  </div>
+  <div class="score-row">
+    <div class="score-pill">正解 <strong id="sc-ok">0</strong></div>
+    <div class="score-pill">問題数 <strong id="sc-tot">0</strong></div>
+    <div class="score-pill">正解率 <strong id="sc-pct">—</strong></div>
+    <span class="streak" id="streak-lbl"></span>
+  </div>
+  <div class="prog-bar"><div class="prog-fill" id="prog" style="width:0%"></div></div>
+  <div id="quiz-area"></div>
+</div>
+
+<!-- FALL -->
+<div id="sec-fret-all" class="sec">
+  <div class="fall-wrap">
+    <div style="margin-bottom:12px">
+      <div style="font-size:15px;font-weight:500;color:var(--text);margin-bottom:4px" id="fall-title">各セルをクリックして音名を入力しましょう</div>
+      <div style="font-size:12px;color:var(--text3)">フレット 0〜12 / 全6弦　<span id="fall-score-lbl" style="color:var(--purple);font-weight:500"></span></div>
+    </div>
+    <div id="fall-fb-wrap" style="overflow-x:auto"></div>
+    <div class="note-keyboard" id="fall-nkey"></div>
+    <div id="fall-result" style="padding:10px 0;font-size:13px;color:var(--text2)"></div>
+    <div style="display:flex;gap:8px;margin-top:8px">
+      <button class="next-btn" style="margin:0" onclick="initFallQuiz()">リセット</button>
+      <button class="next-btn" style="margin:0;background:var(--bg3);border-color:var(--border2);color:var(--text2)" onclick="revealFall()">答えを見る</button>
+    </div>
+  </div>
+</div>
+
+<!-- SCALE QUIZ -->
+<div id="sec-scale-q" class="sec">
+  <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:14px">
+    <label style="font-size:12px;color:var(--text2)">スケール:</label>
+    <select class="fb-select" id="sq-scale-sel" onchange="initScaleQuiz()">
+      <option value="major">メジャースケール</option>
+      <option value="minor">ナチュラルマイナー</option>
+      <option value="penta_min" selected>マイナーペンタトニック</option>
+      <option value="penta_maj">メジャーペンタトニック</option>
+      <option value="blues">ブルーススケール</option>
+      <option value="dorian">ドリアン</option>
+      <option value="mixolydian">ミクソリディアン</option>
+    </select>
+    <label style="font-size:12px;color:var(--text2)">キー:</label>
+    <select class="fb-select" id="sq-key-sel" onchange="initScaleQuiz()">
+      <option value="A" selected>A</option><option value="C">C</option><option value="D">D</option><option value="E">E</option>
+      <option value="F">F</option><option value="G">G</option><option value="B">B</option>
+      <option value="C#">C#</option><option value="D#">D#/Eb</option><option value="F#">F#</option>
+      <option value="G#">G#/Ab</option><option value="A#">A#/Bb</option>
+    </select>
+  </div>
+  <div class="score-row">
+    <div class="score-pill">正解 <strong id="sq-ok">0</strong></div>
+    <div class="score-pill">問題数 <strong id="sq-tot">0</strong></div>
+    <div class="score-pill">正解率 <strong id="sq-pct">—</strong></div>
+  </div>
+  <div id="sq-area"></div>
+</div>
+
+<!-- FBMAP -->
+<div id="sec-fbmap" class="sec">
+  <div class="fb-controls">
+    <label>音:</label>
+    <select class="fb-select" id="fb-note-sel" onchange="renderFBMap()">
+      <option value="">全て</option>
+      <option value="C">C</option><option value="D">D</option><option value="E">E</option>
+      <option value="F">F</option><option value="G">G</option><option value="A">A</option>
+      <option value="B">B</option><option value="C#">C#</option><option value="D#">D#</option>
+      <option value="F#">F#</option><option value="G#">G#</option><option value="A#">A#</option>
+    </select>
+    <label>スケール:</label>
+    <select class="fb-select" id="fb-scale-sel" onchange="renderFBMap()">
+      <option value="">—</option>
+      <option value="major">メジャー</option><option value="minor">ナチュラルマイナー</option>
+      <option value="penta_maj">メジャーペンタ</option><option value="penta_min">マイナーペンタ</option>
+      <option value="blues">ブルース</option><option value="dorian">ドリアン</option>
+      <option value="mixolydian">ミクソリディアン</option>
+    </select>
+    <label>ルート:</label>
+    <select class="fb-select" id="fb-root-sel" onchange="renderFBMap()">
+      <option value="0">C</option><option value="2">D</option><option value="4">E</option>
+      <option value="5">F</option><option value="7">G</option><option value="9">A</option>
+      <option value="11">B</option><option value="1">C#</option><option value="3">D#</option>
+      <option value="6">F#</option><option value="8">G#</option><option value="10">A#</option>
+    </select>
+  </div>
+  <div class="fb-svg-wrap" id="fbmap-svg"></div>
+  <p class="hint-text"><i class="ti ti-circle-filled" style="font-size:12px;color:var(--teal)"></i> ルート音　<i class="ti ti-circle" style="font-size:12px;color:var(--teal)"></i> スケール音　薄点 = スケール外</p>
+</div>
+
+<!-- REF -->
+<div id="sec-ref" class="sec">
+  <div class="mode-row" style="margin-bottom:14px">
+    <button class="mode-chip active" id="ref-intervals" onclick="switchRef('intervals',this)">インターバル</button>
+    <button class="mode-chip" id="ref-scales" onclick="switchRef('scales',this)">スケール一覧</button>
+    <button class="mode-chip" id="ref-chords" onclick="switchRef('chords',this)">コード構成</button>
+  </div>
+  <div id="ref-intervals-sec"></div>
+  <div id="ref-scales-sec" style="display:none">
+    <select class="fb-select" id="ref-scale-type" onchange="renderRefScales()" style="margin-bottom:12px">
+      <option value="major">メジャースケール</option><option value="minor">ナチュラルマイナー</option>
+      <option value="penta_maj">メジャーペンタ</option><option value="penta_min">マイナーペンタ</option>
+      <option value="blues">ブルース</option><option value="dorian">ドリアン</option>
+      <option value="mixolydian">ミクソリディアン</option>
+    </select>
+    <div id="ref-scale-content"></div>
+  </div>
+  <div id="ref-chords-sec" style="display:none"></div>
+</div>
+</div>
+
+<script>
+const NOTES=['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+const NOTE_JP={C:'ド','C#':'ド#',D:'レ','D#':'レ#',E:'ミ',F:'ファ','F#':'ファ#',G:'ソ','G#':'ソ#',A:'ラ','A#':'ラ#',B:'シ'};
+const NOTE_ALT={'C#':'D♭','D#':'E♭','F#':'G♭','G#':'A♭','A#':'B♭'};
+const STRINGS=[4,9,2,7,11,4];
+const STR_NAMES=['1弦 E','2弦 B','3弦 G','4弦 D','5弦 A','6弦 E'];
+const SCALES={
+  major:[0,2,4,5,7,9,11],minor:[0,2,3,5,7,8,10],
+  penta_maj:[0,2,4,7,9],penta_min:[0,3,5,7,10],
+  blues:[0,3,5,6,7,10],dorian:[0,2,3,5,7,9,10],mixolydian:[0,2,4,5,7,9,10]
+};
+const SCALE_NAMES={major:'メジャースケール',minor:'ナチュラルマイナー',penta_maj:'メジャーペンタトニック',penta_min:'マイナーペンタトニック',blues:'ブルーススケール',dorian:'ドリアン',mixolydian:'ミクソリディアン'};
+const SCALE_FORMULA={major:'全全半全全全半',minor:'全半全全半全全',penta_maj:'全全1.5全1.5',penta_min:'1.5全全1.5全',blues:'1.5全半半1.5全',dorian:'全半全全全半全',mixolydian:'全全半全全半全'};
+const SCALE_USE={major:'明るい・ポップ・ロック全般',minor:'暗い・哀愁・バラード',penta_maj:'カントリー・ロックのアドリブ',penta_min:'ロック・ブルース・超定番アドリブ',blues:'ブルース・ロック・ジャズ',dorian:'ジャズ・フュージョン',mixolydian:'ロック・ファンク・ブルージーな明るさ'};
+const INTERVALS=[
+  {n:'1度 (完全1度)',en:'Perfect Unison',semi:0,ex:'C→C',role:'ルート'},
+  {n:'♭2度 (短2度)',en:'Minor 2nd',semi:1,ex:'C→C#',role:'半音上・不協和'},
+  {n:'2度 (長2度)',en:'Major 2nd',semi:2,ex:'C→D',role:'スケールの隣の音'},
+  {n:'♭3度 (短3度)',en:'Minor 3rd',semi:3,ex:'C→D#',role:'マイナーコードの3rd'},
+  {n:'3度 (長3度)',en:'Major 3rd',semi:4,ex:'C→E',role:'メジャーコードの3rd'},
+  {n:'4度 (完全4度)',en:'Perfect 4th',semi:5,ex:'C→F',role:'コードのsus4'},
+  {n:'♭5度 (減5度)',en:'Diminished 5th',semi:6,ex:'C→F#',role:'最も緊張感ある音程'},
+  {n:'5度 (完全5度)',en:'Perfect 5th',semi:7,ex:'C→G',role:'パワーコード・安定'},
+  {n:'♭6度 (短6度)',en:'Minor 6th',semi:8,ex:'C→G#',role:'マイナーの色彩'},
+  {n:'6度 (長6度)',en:'Major 6th',semi:9,ex:'C→A',role:'メジャーペンタに含む'},
+  {n:'♭7度 (短7度)',en:'Minor 7th',semi:10,ex:'C→A#',role:'7thコード・ブルース感'},
+  {n:'7度 (長7度)',en:'Major 7th',semi:11,ex:'C→B',role:'maj7コード・オシャレ'},
+  {n:'8度 (完全8度)',en:'Octave',semi:12,ex:'C→C(高)',role:'オクターブ奏法'},
+];
+
+let quizMode='notename',sc=0,tot=0,streak=0,answered=false,currentQ=null;
+function rand(a){return a[Math.floor(Math.random()*a.length)]}
+function randInt(a,b){return a+Math.floor(Math.random()*(b-a+1))}
+function shuffle(a){let r=[...a];for(let i=r.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[r[i],r[j]]=[r[j],r[i]]}return r}
+
+function switchTab(id,btn){
+  document.querySelectorAll('.sec').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('sec-'+id).classList.add('active');
+  btn.classList.add('active');
+  if(id==='fbmap')renderFBMap();
+  if(id==='ref')renderRefIntervals();
+  if(id==='fret-all')initFallQuiz();
+  if(id==='scale-q')initScaleQuiz();
+}
+
+function setMode(m,btn){
+  quizMode=m;
+  document.querySelectorAll('.mode-chip').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  nextQ();
+}
+
+function updateScore(){
+  document.getElementById('sc-ok').textContent=sc;
+  document.getElementById('sc-tot').textContent=tot;
+  document.getElementById('sc-pct').textContent=tot?Math.round(sc/tot*100)+'%':'—';
+  document.getElementById('prog').style.width=tot?Math.round(sc/tot*100)+'%':'0%';
+  document.getElementById('streak-lbl').textContent=streak>1?'🔥 '+streak+' 連続正解':'';
+}
+
+function genNotename(){
+  const note=rand(NOTES);
+  const type=rand(['en2jp','jp2en','alt']);
+  if(type==='en2jp'){
+    const ans=NOTE_JP[note];
+    const w=shuffle(Object.values(NOTE_JP).filter(v=>v!==ans)).slice(0,3);
+    return{label:'音名・日本語',q:'この音の日本語読みは？\n\n'+note,ans,choices:shuffle([ans,...w]),ex:note+' = '+NOTE_JP[note]+(NOTE_ALT[note]?' (異名同音: '+NOTE_ALT[note]+')':'')};
+  }else if(type==='jp2en'){
+    const ans=note;
+    const w=shuffle(NOTES.filter(n=>n!==ans)).slice(0,3);
+    return{label:'音名・英語表記',q:'この音の英語表記は？\n\n'+NOTE_JP[note],ans,choices:shuffle([ans,...w]),ex:NOTE_JP[note]+' = '+note};
+  }else{
+    if(!NOTE_ALT[note])return genNotename();
+    const ans=NOTE_ALT[note];
+    const w=shuffle(Object.values(NOTE_ALT).filter(v=>v!==ans)).slice(0,3);
+    return{label:'異名同音',q:'この音の異名同音（エンハーモニック）は？\n\n'+note,ans,choices:shuffle([ans,...w]),ex:note+' と '+NOTE_ALT[note]+' は同じ音の別表記'};
+  }
+}
+
+function genFret(){
+  const str=randInt(0,5);
+  const fret=randInt(0,11);
+  const noteIdx=(STRINGS[str]+fret)%12;
+  const note=NOTES[noteIdx];
+  const strLabel=['1弦（高E）','2弦（B）','3弦（G）','4弦（D）','5弦（A）','6弦（低E）'][5-str];
+  const ans=note;
+  const w=shuffle(NOTES.filter(n=>n!==ans)).slice(0,3);
+  return{label:'指板の音',q:strLabel+' の '+fret+' フレットは何の音？',ans,choices:shuffle([ans,...w]),ex:'開放弦 '+NOTES[STRINGS[str]]+' + '+fret+'半音 = '+note+'（'+NOTE_JP[note]+'）',fret:{str,fret,note}};
+}
+
+function genInterval(){
+  const iv=rand(INTERVALS);
+  const type=rand(['semi2name','name2semi','semi2role']);
+  if(type==='semi2name'){
+    const ans=iv.n;const w=shuffle(INTERVALS.filter(i=>i.n!==ans)).slice(0,3).map(i=>i.n);
+    return{label:'インターバル',q:'半音数 '+iv.semi+' の音程は？',ans,choices:shuffle([ans,...w]),ex:iv.semi+'半音 = '+iv.n+' ('+iv.en+') 例: '+iv.ex};
+  }else if(type==='name2semi'){
+    const ans=String(iv.semi);const w=shuffle(INTERVALS.filter(i=>i.semi!==iv.semi)).slice(0,3).map(i=>String(i.semi));
+    return{label:'インターバル',q:iv.n+' は何半音？',ans,choices:shuffle([ans,...w]),ex:iv.n+' = '+iv.semi+'半音。例: '+iv.ex};
+  }else{
+    const ans=iv.role;const w=shuffle(INTERVALS.filter(i=>i.role!==ans)).slice(0,3).map(i=>i.role);
+    return{label:'インターバル・役割',q:iv.n+'（'+iv.semi+'半音）の役割は？',ans,choices:shuffle([ans,...w]),ex:iv.n+': '+iv.role};
+  }
+}
+
+function genChord(){
+  const root=rand(NOTES);
+  const types=[
+    {name:'メジャー',formula:[0,4,7],roles:'ルート - 長3度 - 完全5度'},
+    {name:'マイナー',formula:[0,3,7],roles:'ルート - 短3度 - 完全5度'},
+    {name:'dom7',formula:[0,4,7,10],roles:'ルート - 長3度 - 完全5度 - 短7度'},
+    {name:'maj7',formula:[0,4,7,11],roles:'ルート - 長3度 - 完全5度 - 長7度'},
+    {name:'m7',formula:[0,3,7,10],roles:'ルート - 短3度 - 完全5度 - 短7度'},
+    {name:'dim',formula:[0,3,6],roles:'ルート - 短3度 - 減5度'},
+    {name:'sus4',formula:[0,5,7],roles:'ルート - 完全4度 - 完全5度'},
+  ];
+  const ct=rand(types);
+  const ri=NOTES.indexOf(root);
+  const tones=ct.formula.map(s=>NOTES[(ri+s)%12]);
+  const ans=tones.join(' - ');
+  const wRoots=shuffle(NOTES.filter(n=>n!==root)).slice(0,3);
+  const w=wRoots.map(r=>ct.formula.map(s=>NOTES[(NOTES.indexOf(r)+s)%12]).join(' - '));
+  return{label:'コードの構成音',q:root+' '+ct.name+' コードの構成音は？',ans,choices:shuffle([ans,...w]),ex:root+' '+ct.name+': '+ans+'\n構成: '+ct.roles};
+}
+
+function genScaleQ(){
+  const scKeys=Object.keys(SCALES);
+  const sk=rand(scKeys);
+  const root=rand(NOTES);
+  const ri=NOTES.indexOf(root);
+  const tones=SCALES[sk].map(s=>NOTES[(ri+s)%12]);
+  const type=rand(['name2intervals','formula','use']);
+  if(type==='name2intervals'){
+    const ans=tones.join(' ');
+    const w=shuffle(NOTES.filter(n=>n!==root)).slice(0,3).map(r=>SCALES[sk].map(s=>NOTES[(NOTES.indexOf(r)+s)%12]).join(' '));
+    return{label:'スケール構成音',q:root+' '+SCALE_NAMES[sk]+' の構成音は？',ans,choices:shuffle([ans,...w]),ex:root+' '+SCALE_NAMES[sk]+': '+ans+'\nフォーミュラ: '+SCALE_FORMULA[sk]};
+  }else if(type==='formula'){
+    const ans=SCALE_FORMULA[sk];
+    const w=shuffle(scKeys.filter(k=>k!==sk)).slice(0,3).map(k=>SCALE_FORMULA[k]);
+    return{label:'スケール・フォーミュラ',q:SCALE_NAMES[sk]+' のフォーミュラは？\n（全=全音 / 半=半音）',ans,choices:shuffle([ans,...w]),ex:SCALE_NAMES[sk]+': '+SCALE_FORMULA[sk]};
+  }else{
+    const ans=SCALE_USE[sk];
+    const w=shuffle(scKeys.filter(k=>k!==sk)).slice(0,3).map(k=>SCALE_USE[k]);
+    return{label:'スケール・用途',q:'このスケールの主な用途は？\n\n'+SCALE_NAMES[sk],ans,choices:shuffle([ans,...w]),ex:SCALE_NAMES[sk]+': '+SCALE_USE[sk]};
+  }
+}
+
+function nextQ(){
+  answered=false;
+  let q;
+  if(quizMode==='notename')q=genNotename();
+  else if(quizMode==='fret')q=genFret();
+  else if(quizMode==='interval')q=genInterval();
+  else if(quizMode==='chord')q=genChord();
+  else q=genScaleQ();
+  currentQ=q;
+  renderQ(q);
+}
+
+function renderQ(q){
+  const fretSVG=q.fret?`<div style="margin:12px 0;overflow-x:auto">${buildMiniFret(q.fret.str,q.fret.fret)}</div>`:'';
+  document.getElementById('quiz-area').innerHTML=`
+    <div class="qcard">
+      <div class="qtop">
+        <div class="qlabel">${q.label}</div>
+        <div class="qtext">${q.q.replace(/\n/g,'<br>')}</div>
+        ${fretSVG}
+      </div>
+      <div class="choices" id="choices">
+        ${q.choices.map((c,i)=>`<button class="choice" onclick="answer('${c.replace(/'/g,'&#39;')}')" id="ch${i}">${c}</button>`).join('')}
+      </div>
+      <div id="res-area"></div>
+      <div id="next-wrap" style="display:none;padding:0 16px 16px"><button class="next-btn" onclick="nextQ()">次の問題 →</button></div>
+    </div>`;
+}
+
+function buildMiniFret(strIdx,fretNum){
+  const W=460,H=120,pL=50,pR=20,pT=18,pB=22;
+  const fw=(W-pL-pR)/12;
+  const sh=(H-pT-pB)/5;
+  let s=`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="min-width:320px;width:100%;max-width:460px">`;
+  for(let f=0;f<=12;f++){
+    const x=pL+f*fw;
+    s+=`<line x1="${x}" y1="${pT}" x2="${x}" y2="${H-pB}" stroke="#444" stroke-width="${f===0?2:.5}"/>`;
+  }
+  for(let st=0;st<6;st++){
+    const y=pT+st*sh;
+    s+=`<line x1="${pL}" y1="${y}" x2="${W-pR}" y2="${y}" stroke="#666" stroke-width="${.5+st*.25}"/>`;
+    s+=`<text x="${pL-6}" y="${y+4}" text-anchor="end" font-size="10" fill="#666">${STR_NAMES[st].split(' ')[0]}</text>`;
+  }
+  [3,5,7,9].forEach(f=>{
+    const x=pL+(f-.5)*fw;
+    s+=`<circle cx="${x}" cy="${H/2}" r="2.5" fill="#333"/>`;
+    s+=`<text x="${x}" y="${H-4}" text-anchor="middle" font-size="9" fill="#555">${f}</text>`;
+  });
+  const tx=pL+(fretNum===0?-10:fretNum*fw-fw/2);
+  const ty=pT+(5-strIdx)*sh;
+  s+=`<circle cx="${tx}" cy="${ty}" r="11" fill="#8b7cf8"/>`;
+  s+=`<text x="${tx}" y="${ty+4}" text-anchor="middle" font-size="10" fill="#fff" font-weight="600">?</text>`;
+  s+='</svg>';
+  return s;
+}
+
+function answer(chosen){
+  if(answered)return;
+  answered=true;tot++;
+  const ok=chosen===currentQ.ans;
+  if(ok){sc++;streak++;}else{streak=0;}
+  updateScore();
+  document.querySelectorAll('.choice').forEach(b=>{
+    b.disabled=true;
+    if(b.textContent===currentQ.ans)b.classList.add('correct');
+    else if(b.textContent===chosen&&!ok)b.classList.add('wrong');
+  });
+  document.getElementById('res-area').innerHTML=`<div class="result-banner ${ok?'ok':'ng'}" style="margin:0 16px 10px">
+    <span class="rlabel">${ok?'✓ 正解！':'✗ 不正解'}</span>
+    ${currentQ.ex.replace(/\n/g,'<br>')}
+  </div>`;
+  document.getElementById('next-wrap').style.display='block';
+}
+
+// FALL
+const FRET_COUNT=12;
+let fallState={},fallTarget=null;
+
+function initFallQuiz(){
+  fallState={};fallTarget=null;
+  document.getElementById('fall-score-lbl').textContent='';
+  document.getElementById('fall-result').textContent='';
+  document.getElementById('fall-title').textContent='セルをクリックして音名を入力しましょう';
+  renderFallFB();
+  document.getElementById('fall-nkey').innerHTML=NOTES.map(n=>`<button class="nkey${n.includes('#')?' sharp-key':''}" onclick="setFallNote('${n}')">${n}</button>`).join('');
+}
+
+function renderFallFB(){
+  const wrap=document.getElementById('fall-fb-wrap');
+  let html='<table style="border-collapse:collapse;font-size:11px">';
+  html+=`<tr><th style="padding:4px 6px;color:#666;font-weight:400;text-align:right;font-size:10px"></th>`;
+  for(let f=0;f<=FRET_COUNT;f++)html+=`<th style="padding:4px 5px;color:#555;font-weight:400;text-align:center;min-width:34px;font-size:10px">${f}</th>`;
+  html+='</tr>';
+  for(let st=0;st<6;st++){
+    html+=`<tr><td style="padding:4px 6px;color:#666;font-size:10px;white-space:nowrap;text-align:right">${STR_NAMES[st]}</td>`;
+    for(let f=0;f<=FRET_COUNT;f++){
+      const key=`${st}-${f}`;
+      const filled=fallState[key];
+      const isTarget=fallTarget===key;
+      let bg=isTarget?'#1e1a3a':filled?(filled.ok?'#0d2818':'#2a0d0d'):'#1a1a1a';
+      let bc=isTarget?'#8b7cf8':filled?(filled.ok?'#1e5c33':'#5c1e1e'):'#333';
+      let col=isTarget?'#a99ff9':filled?(filled.ok?'#4ade80':'#f87171'):'#555';
+      html+=`<td style="padding:3px"><div onclick="selectFallCell('${key}')" style="width:33px;height:33px;border:${isTarget?'1.5px':'0.5px'} solid ${bc};border-radius:6px;background:${bg};display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:${col};cursor:pointer;transition:all .1s">${filled?filled.val:''}</div></td>`;
+    }
+    html+='</tr>';
+  }
+  html+='</table>';
+  wrap.innerHTML=html;
+}
+
+function selectFallCell(key){
+  fallTarget=key;
+  renderFallFB();
+}
+
+function setFallNote(note){
+  if(!fallTarget)return;
+  const [st,f]=fallTarget.split('-').map(Number);
+  const correct=NOTES[(STRINGS[st]+f)%12];
+  fallState[fallTarget]={val:note,ok:note===correct};
+  const allKeys=[];
+  for(let s=0;s<6;s++)for(let ff=0;ff<=FRET_COUNT;ff++)allKeys.push(`${s}-${ff}`);
+  const done=allKeys.filter(k=>fallState[k]);
+  const ok=done.filter(k=>fallState[k].ok).length;
+  document.getElementById('fall-score-lbl').textContent=`${done.length} / ${allKeys.length} 入力　正解: ${ok}`;
+  if(done.length===allKeys.length){
+    const pct=Math.round(ok/allKeys.length*100);
+    document.getElementById('fall-result').innerHTML=`<span style="color:${pct>=80?'#4ade80':'#f87171'};font-weight:600;font-size:14px">完了！ ${ok} / ${allKeys.length} 正解（${pct}%）${pct>=90?' 🎉 完璧！':pct>=70?' よくできました！':' もう一度挑戦！'}</span>`;
+  }
+  renderFallFB();
+}
+
+function revealFall(){
+  for(let s=0;s<6;s++)for(let f=0;f<=FRET_COUNT;f++){
+    const key=`${s}-${f}`;
+    fallState[key]={val:NOTES[(STRINGS[s]+f)%12],ok:true};
+  }
+  document.getElementById('fall-score-lbl').textContent='答え表示中';
+  renderFallFB();
+}
+
+// SCALE QUIZ
+let sqOk=0,sqTot=0,sqCurrentTones=[],sqAnswered=[];
+
+function initScaleQuiz(){
+  sqOk=0;sqTot=0;sqCurrentTones=[];sqAnswered=[];
+  updateSqScore();
+  nextScaleQ();
+}
+function updateSqScore(){
+  document.getElementById('sq-ok').textContent=sqOk;
+  document.getElementById('sq-tot').textContent=sqTot;
+  document.getElementById('sq-pct').textContent=sqTot?Math.round(sqOk/sqTot*100)+'%':'—';
+}
+function nextScaleQ(){
+  const sk=document.getElementById('sq-scale-sel').value;
+  const root=document.getElementById('sq-key-sel').value;
+  const ri=NOTES.indexOf(root);
+  sqCurrentTones=SCALES[sk].map(s=>NOTES[(ri+s)%12]);
+  sqAnswered=[];
+  const area=document.getElementById('sq-area');
+  area.innerHTML=`
+    <div class="scale-qcard">
+      <div class="qtop">
+        <div class="qlabel">スケールクイズ</div>
+        <div class="qtext">${root} ${SCALE_NAMES[sk]} の構成音をすべて選んでください<span class="key-badge">${root}</span></div>
+        <div class="qhint">${SCALE_FORMULA[sk]}　構成音: ${sqCurrentTones.length}音</div>
+      </div>
+      <div style="padding:12px 16px">
+        <div style="font-size:12px;color:#666;margin-bottom:10px">正しい音をすべてタップ:</div>
+        <div class="sbtns" id="sq-btns">
+          ${shuffle(NOTES).map(n=>`<button class="sbtn" id="sqb-${n.replace('#','s')}" onclick="sqAnswer('${n}')">${n}</button>`).join('')}
+        </div>
+        <div id="sq-res" style="margin-top:10px;font-size:13px;color:#666">
+          選んだ音: <span id="sq-chosen" style="color:#aaa">—</span>　残り: <span id="sq-remain" style="color:var(--purple);font-weight:500">${sqCurrentTones.length}</span>音
+        </div>
+      </div>
+      <div id="sq-next" style="display:none;padding:0 16px 16px"><button class="next-btn" onclick="nextScaleQ()">次の問題 →</button></div>
+    </div>`;
+}
+function sqAnswer(note){
+  if(sqAnswered.includes(note))return;
+  const id=note.replace('#','s');
+  const btn=document.getElementById('sqb-'+id);
+  const inScale=sqCurrentTones.includes(note);
+  sqAnswered.push(note);sqTot++;
+  if(inScale){sqOk++;btn.classList.add('correct');}else{btn.classList.add('wrong');}
+  btn.disabled=true;
+  updateSqScore();
+  const chosen=sqAnswered.filter(n=>sqCurrentTones.includes(n));
+  document.getElementById('sq-chosen').textContent=chosen.join(' ')||'—';
+  document.getElementById('sq-remain').textContent=sqCurrentTones.length-chosen.length;
+  if(chosen.length===sqCurrentTones.length){
+    sqCurrentTones.forEach(n=>{
+      const b=document.getElementById('sqb-'+n.replace('#','s'));
+      if(b&&!b.classList.contains('correct'))b.classList.add('reveal');
+    });
+    document.getElementById('sq-next').style.display='block';
+    document.getElementById('sq-res').innerHTML=`<span style="color:#4ade80;font-weight:600">✓ 全音選択完了！ ${sqCurrentTones.join(' - ')}</span>`;
+  }
+}
+
+// FBMAP
+function renderFBMap(){
+  const selNote=document.getElementById('fb-note-sel').value;
+  const scType=document.getElementById('fb-scale-sel').value;
+  const rootOffset=parseInt(document.getElementById('fb-root-sel').value);
+  const scNotes=scType?SCALES[scType].map(s=>(rootOffset+s)%12):null;
+  const W=680,H=210,pL=44,pR=16,pT=28,pB=22;
+  const fw=(W-pL-pR)/12;
+  const sh=(H-pT-pB)/5;
+  const strNotes=['E','B','G','D','A','E'];
+  let svg=`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="min-width:500px;width:100%">`;
+  for(let f=0;f<=12;f++){
+    const x=pL+f*fw;
+    svg+=`<line x1="${x}" y1="${pT}" x2="${x}" y2="${H-pB}" stroke="#333" stroke-width="${f===0?2:.5}"/>`;
+  }
+  for(let s=0;s<6;s++){
+    const y=pT+s*sh;
+    svg+=`<line x1="${pL}" y1="${y}" x2="${W-pR}" y2="${y}" stroke="#555" stroke-width="${.5+s*.3}"/>`;
+    svg+=`<text x="${pL-5}" y="${y+4}" text-anchor="end" font-size="10" fill="#666">${strNotes[s]}</text>`;
+  }
+  [3,5,7,9,12].forEach(f=>{
+    const x=pL+(f-.5)*fw;
+    if(f===12){svg+=`<circle cx="${x}" cy="${pT+sh}" r="3" fill="#2a2a2a"/><circle cx="${x}" cy="${pT+3*sh}" r="3" fill="#2a2a2a"/>`;}
+    else{svg+=`<circle cx="${x}" cy="${H/2}" r="3" fill="#2a2a2a"/>`;}
+    svg+=`<text x="${x}" y="${H-4}" text-anchor="middle" font-size="9" fill="#555">${f}</text>`;
+  });
+  for(let s=0;s<6;s++){
+    const base=STRINGS[5-s];
+    for(let f=0;f<=12;f++){
+      const ni=(base+f)%12;
+      const nm=NOTES[ni];
+      const x=pL+(f===0?-12:f*fw-fw/2);
+      const y=pT+s*sh;
+      const isSel=selNote&&nm===selNote;
+      const isRoot=scNotes&&ni===rootOffset%12;
+      const inSc=scNotes&&scNotes.includes(ni);
+      if(isRoot){
+        svg+=`<circle cx="${x}" cy="${y}" r="11" fill="#2dd4bf"/>`;
+        svg+=`<text x="${x}" y="${y+4}" text-anchor="middle" font-size="10" fill="#000" font-weight="700">${nm}</text>`;
+      }else if(inSc){
+        svg+=`<circle cx="${x}" cy="${y}" r="10" fill="none" stroke="#2dd4bf" stroke-width="1.5"/>`;
+        svg+=`<text x="${x}" y="${y+4}" text-anchor="middle" font-size="9" fill="#ccc">${nm}</text>`;
+      }else if(isSel){
+        svg+=`<circle cx="${x}" cy="${y}" r="11" fill="#8b7cf8"/>`;
+        svg+=`<text x="${x}" y="${y+4}" text-anchor="middle" font-size="10" fill="#fff" font-weight="600">${nm}</text>`;
+      }else if(!selNote&&!scNotes){
+        svg+=`<circle cx="${x}" cy="${y}" r="9" fill="#1a1a1a" stroke="#333" stroke-width=".5"/>`;
+        svg+=`<text x="${x}" y="${y+4}" text-anchor="middle" font-size="9" fill="#666">${nm}</text>`;
+      }else{
+        svg+=`<circle cx="${x}" cy="${y}" r="4" fill="#222" opacity=".6"/>`;
+      }
+    }
+  }
+  svg+='</svg>';
+  document.getElementById('fbmap-svg').innerHTML=svg;
+}
+
+// REF
+function switchRef(id,btn){
+  ['intervals','scales','chords'].forEach(r=>{
+    document.getElementById('ref-'+r+'-sec').style.display='none';
+    document.getElementById('ref-'+r).classList.remove('active');
+  });
+  document.getElementById('ref-'+id+'-sec').style.display='';
+  btn.classList.add('active');
+  if(id==='scales')renderRefScales();
+  if(id==='chords')renderRefChords();
+}
+
+function renderRefIntervals(){
+  const badges=[,'bp','bt','bt','bp','ba','bt','bc','bt','bp','ba','ba','bp','bt'];
+  document.getElementById('ref-intervals-sec').innerHTML=`<div class="ref-card"><table class="ref-table"><thead><tr><th>度数</th><th>英語名</th><th>半音</th><th>例</th><th>役割</th></tr></thead><tbody>${INTERVALS.map(iv=>`<tr><td><span class="badge ${badges[iv.semi]||'bt'}">${iv.n}</span></td><td style="color:#888;font-size:12px">${iv.en}</td><td style="text-align:center;font-weight:600;color:#f0f0f0">${iv.semi}</td><td style="font-family:monospace;font-size:12px;color:#aaa">${iv.ex}</td><td style="font-size:12px;color:#888">${iv.role}</td></tr>`).join('')}</tbody></table></div>`;
+}
+
+function renderRefScales(){
+  const sk=document.getElementById('ref-scale-type').value;
+  const roots=['C','D','E','F','G','A','B','C#','D#','F#','G#','A#'];
+  document.getElementById('ref-scale-content').innerHTML=`<div style="padding:10px 14px;background:#1a1a1a;border-radius:8px;margin-bottom:10px;font-size:13px;border-left:2px solid #8b7cf8">
+    <span style="font-weight:600;color:#f0f0f0">${SCALE_NAMES[sk]}</span>
+    <span style="color:#666;margin:0 8px">|</span>フォーミュラ: <span style="color:#a99ff9">${SCALE_FORMULA[sk]}</span>
+    <span style="color:#666;margin:0 8px">|</span><span style="color:#666">${SCALE_USE[sk]}</span>
+  </div><div class="ref-card"><table class="ref-table"><thead><tr><th>ルート</th><th>構成音</th></tr></thead><tbody>${roots.map(r=>{const ri=NOTES.indexOf(r);const t=SCALES[sk].map(s=>NOTES[(ri+s)%12]);return`<tr><td style="font-weight:600;min-width:36px;color:#f0f0f0">${r}</td><td style="font-family:monospace;font-size:13px;letter-spacing:.06em;color:#ccc">${t.join('  ')}</td></tr>`}).join('')}</tbody></table></div>`;
+}
+
+function renderRefChords(){
+  const chords=[
+    {type:'メジャー',formula:[0,4,7],ex:'明るい・安定'},
+    {type:'マイナー',formula:[0,3,7],ex:'暗い・哀愁'},
+    {type:'7 (dom7)',formula:[0,4,7,10],ex:'ブルース・ファンク'},
+    {type:'M7',formula:[0,4,7,11],ex:'オシャレ・ジャズ'},
+    {type:'m7',formula:[0,3,7,10],ex:'ソフト・ジャズ'},
+    {type:'dim',formula:[0,3,6],ex:'緊張感・不安定'},
+    {type:'aug',formula:[0,4,8],ex:'浮遊感'},
+    {type:'sus2',formula:[0,2,7],ex:'開放的'},
+    {type:'sus4',formula:[0,5,7],ex:'宙吊り感'},
+  ];
+  const roots=['C','D','E','F','G','A'];
+  document.getElementById('ref-chords-sec').innerHTML=`<div class="ref-card"><table class="ref-table"><thead><tr><th>コード</th>${roots.map(r=>`<th>${r}</th>`).join('')}<th>特徴</th></tr></thead><tbody>${chords.map(c=>`<tr><td><span class="badge bp">${c.type}</span></td>${roots.map(r=>{const ri=NOTES.indexOf(r);return`<td style="font-family:monospace;font-size:11px;color:#aaa">${c.formula.map(s=>NOTES[(ri+s)%12]).join('-')}</td>`}).join('')}<td style="font-size:12px;color:#666">${c.ex}</td></tr>`).join('')}</tbody></table></div>`;
+}
+
+nextQ();
+</script>
+</body>
+</html>
