@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Guitar TAB Manager</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0f0f13;--bg2:#1a1a22;--bg3:#131318;--bg4:#242430;
+  --border:#2a2a35;--border2:#3a3a4a;
+  --text:#e8e8ec;--text2:#888;--text3:#555;
+  --accent:#534AB7;--accent-light:#7B6FD4;--accent-bg:#1e1a3a;
+  --green:#1D9E75;--green-bg:#0d2818;
+  --red:#E24B4A;--red-bg:#2a0d0d;
+  --amber:#EF9F27;--blue:#3A7BD5;
+  --tab-bg:#0d1117;
+}
+body{font-family:'Yu Gothic UI',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column}
+
+.toolbar{display:flex;align-items:center;gap:6px;padding:8px 12px;background:var(--bg2);border-bottom:1px solid var(--border);flex-wrap:wrap}
+.toolbar-btn{padding:7px 14px;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;color:var(--text);transition:all .15s;white-space:nowrap}
+.toolbar-btn:hover{filter:brightness(1.2)}
+.tb-accent{background:var(--accent)}
+.tb-default{background:var(--bg4)}
+.tb-green{background:#1a3a1a}
+.tb-red{background:#3a1212}
+.toolbar-sep{width:1px;height:28px;background:var(--border);margin:0 4px}
+.search-box{margin-left:auto;display:flex;align-items:center;gap:6px}
+.search-box input{padding:6px 10px;border:1px solid var(--border);border-radius:6px;background:var(--bg4);color:var(--text);font-size:12px;width:160px;outline:none}
+.search-box input:focus{border-color:var(--accent)}
+
+.main{display:flex;flex:1;overflow:hidden}
+
+.sidebar{width:240px;min-width:180px;background:var(--bg3);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden}
+.sidebar-header{padding:14px 12px 8px;font-size:13px;font-weight:600;color:var(--accent-light)}
+.song-list{flex:1;overflow-y:auto;padding:4px 6px}
+.song-item{padding:8px 10px;border-radius:6px;cursor:pointer;margin-bottom:2px;transition:all .1s;font-size:13px;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.song-item:hover{background:var(--bg4);color:var(--text)}
+.song-item.active{background:var(--accent-bg);color:var(--accent-light);border-left:3px solid var(--accent)}
+.song-item .song-artist{font-size:11px;color:var(--text3);margin-top:2px}
+.song-count{padding:6px 12px;font-size:11px;color:var(--text3);border-top:1px solid var(--border)}
+
+.editor{flex:1;display:flex;flex-direction:column;overflow:hidden}
+
+.song-info{padding:12px 16px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+.info-group{display:flex;align-items:center;gap:6px}
+.info-label{font-size:11px;color:var(--text3);white-space:nowrap}
+.info-input{padding:5px 8px;border:1px solid var(--border);border-radius:5px;background:var(--bg4);color:var(--text);font-size:13px;outline:none}
+.info-input:focus{border-color:var(--accent)}
+.info-input.title-input{font-size:16px;font-weight:600;width:220px}
+.info-input.artist-input{width:160px}
+.info-select{padding:5px 8px;border:1px solid var(--border);border-radius:5px;background:var(--bg4);color:var(--text);font-size:12px;outline:none;cursor:pointer}
+
+.section-bar{display:flex;align-items:center;background:#0a0a10;border-bottom:1px solid var(--border);overflow-x:auto}
+.section-tab{padding:8px 16px;font-size:12px;color:var(--text2);cursor:pointer;border:none;background:none;white-space:nowrap;transition:all .1s}
+.section-tab:hover{color:var(--text)}
+.section-tab.active{color:var(--text);background:var(--accent);font-weight:600;border-radius:4px 4px 0 0}
+.section-add{padding:8px 14px;font-size:12px;color:var(--text3);cursor:pointer;border:none;background:none;margin-left:auto;white-space:nowrap}
+.section-add:hover{color:var(--accent-light)}
+
+.template-bar{display:flex;align-items:center;gap:6px;padding:4px 12px;background:var(--bg4);border-bottom:1px solid var(--border)}
+.template-bar span{font-size:11px;color:var(--text3)}
+.tpl-btn{padding:3px 10px;border:1px solid var(--border);border-radius:4px;font-size:11px;cursor:pointer;background:var(--bg2);color:var(--text2);transition:all .1s}
+.tpl-btn:hover{background:var(--accent-bg);color:var(--accent-light);border-color:var(--accent)}
+
+.tab-editor-wrap{flex:1;overflow:auto;position:relative}
+.tab-editor{width:100%;height:100%;padding:16px 18px;background:var(--tab-bg);color:#c0caf5;font-family:'Consolas','Courier New',monospace;font-size:14px;line-height:1.6;border:none;outline:none;resize:none;tab-size:4}
+
+.notes-bar{padding:8px 14px;background:var(--bg2);border-top:1px solid var(--border)}
+.notes-bar label{font-size:11px;color:var(--text3);display:block;margin-bottom:4px}
+.notes-input{width:100%;padding:6px 10px;border:1px solid var(--border);border-radius:5px;background:var(--bg4);color:var(--text);font-size:12px;outline:none;resize:none;height:48px;font-family:inherit}
+
+.status-bar{padding:6px 14px;background:var(--bg4);border-top:1px solid var(--border);font-size:11px;color:var(--text3);display:flex;justify-content:space-between}
+
+.empty-state{flex:1;display:flex;align-items:center;justify-content:center;color:var(--text3);font-size:14px;text-align:center;padding:40px}
+
+.modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;z-index:100}
+.modal{background:var(--bg2);border:1px solid var(--border2);border-radius:10px;padding:24px;min-width:340px;max-width:90vw}
+.modal h3{font-size:15px;margin-bottom:16px;color:var(--text)}
+.modal input,.modal select{width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:6px;background:var(--bg4);color:var(--text);font-size:13px;margin-bottom:12px;outline:none}
+.modal input:focus{border-color:var(--accent)}
+.modal-btns{display:flex;gap:8px;justify-content:flex-end;margin-top:8px}
+.modal-btn{padding:8px 18px;border:none;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;color:var(--text)}
+.modal-btn.primary{background:var(--accent)}
+.modal-btn.cancel{background:var(--bg4)}
+
+@media(max-width:700px){
+  .sidebar{width:180px;min-width:140px}
+  .song-info{padding:8px 10px;gap:8px}
+  .info-input.title-input{width:140px;font-size:14px}
+  .info-input.artist-input{width:100px}
+}
+</style>
+</head>
+<body>
+
+<div class="toolbar">
+  <button class="toolbar-btn tb-accent" onclick="newSong()">+ 新しい曲</button>
+  <button class="toolbar-btn tb-default" onclick="saveCurrent()">&#x1f4be; 保存</button>
+  <button class="toolbar-btn tb-default" onclick="exportText()">&#x1f4cb; テキスト出力</button>
+  <button class="toolbar-btn tb-default" onclick="renameSectionPrompt()">&#x270f;&#xfe0f; セクション名変更</button>
+  <button class="toolbar-btn tb-default" onclick="deleteSectionPrompt()">&#x2796; セクション削除</button>
+  <div class="toolbar-sep"></div>
+  <button class="toolbar-btn tb-red" onclick="deleteSong()">&#x1f5d1; 曲を削除</button>
+  <div class="search-box">
+    <span style="font-size:12px;color:var(--text3)">検索:</span>
+    <input type="text" id="search-input" placeholder="曲名・アーティスト" oninput="renderSongList()">
+  </div>
+</div>
+
+<div class="main">
+  <div class="sidebar">
+    <div class="sidebar-header">&#x1f3b8; 曲ライブラリ</div>
+    <div class="song-list" id="song-list"></div>
+    <div class="song-count" id="song-count">0 曲</div>
+  </div>
+
+  <div class="editor" id="editor-area">
+    <div class="empty-state" id="empty-state">
+      曲を選択するか、「+ 新しい曲」で追加してください
+    </div>
+
+    <div id="editor-content" style="display:none;flex:1;display:flex;flex-direction:column">
+      <div class="song-info">
+        <div class="info-group">
+          <span class="info-label">曲名</span>
+          <input class="info-input title-input" id="inp-title" placeholder="曲名">
+        </div>
+        <div class="info-group">
+          <span class="info-label">アーティスト</span>
+          <input class="info-input artist-input" id="inp-artist" placeholder="アーティスト">
+        </div>
+        <div class="info-group">
+          <span class="info-label">チューニング</span>
+          <select class="info-select" id="inp-tuning">
+            <option>Standard (EADGBe)</option>
+            <option>Drop D (DADGBe)</option>
+            <option>Open G (DGDGBd)</option>
+            <option>Open D (DADf#Ad)</option>
+            <option>DADGAD</option>
+            <option>Half Step Down</option>
+            <option>Full Step Down</option>
+            <option>Open E (EBE G#Be)</option>
+            <option>Open A (EAE AC#E)</option>
+          </select>
+        </div>
+        <div class="info-group">
+          <span class="info-label">BPM</span>
+          <input class="info-input" id="inp-bpm" placeholder="120" style="width:60px">
+        </div>
+        <div class="info-group">
+          <span class="info-label">カポ</span>
+          <select class="info-select" id="inp-capo">
+            <option value="0">なし</option>
+            <option value="1">1</option><option value="2">2</option><option value="3">3</option>
+            <option value="4">4</option><option value="5">5</option><option value="6">6</option>
+            <option value="7">7</option><option value="8">8</option><option value="9">9</option>
+            <option value="10">10</option><option value="11">11</option><option value="12">12</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="section-bar" id="section-bar">
+        <button class="section-add" onclick="addSection()">+ セクション追加</button>
+      </div>
+
+      <div class="template-bar">
+        <span>挿入:</span>
+        <button class="tpl-btn" onclick="insertTemplate('empty')">6弦枠</button>
+        <button class="tpl-btn" onclick="insertTemplate('chord')">コード</button>
+        <button class="tpl-btn" onclick="insertTemplate('divider')">区切り</button>
+      </div>
+
+      <div class="tab-editor-wrap">
+        <textarea class="tab-editor" id="tab-editor" spellcheck="false" placeholder="ここにTAB譜を入力..."></textarea>
+      </div>
+
+      <div class="notes-bar">
+        <label>メモ・コード表:</label>
+        <textarea class="notes-input" id="inp-notes" placeholder="自由メモ..."></textarea>
+      </div>
+
+      <div class="status-bar">
+        <span id="status-text">準備完了</span>
+        <span id="status-modified"></span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal" style="display:none">
+  <div class="modal" id="modal-content"></div>
+</div>
+
+<script>
+const EMPTY_TAB = `e|----------------------------|\nB|----------------------------|\nG|----------------------------|\nD|----------------------------|\nA|----------------------------|\nE|----------------------------|`;
+const STORAGE_KEY = 'guitar_tab_manager_songs';
+
+let songs = [];
+let currentIdx = null;
+let currentSectionIdx = 0;
+let dirty = false;
+
+function loadSongs() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    songs = raw ? JSON.parse(raw) : [];
+  } catch { songs = []; }
+}
+
+function persistSongs() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(songs));
+}
+
+function newSongData(title, artist) {
+  const now = new Date().toISOString().slice(0, 10);
+  return {
+    id: crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2),
+    title: title || '新しい曲',
+    artist: artist || '',
+    tuning: 'Standard (EADGBe)',
+    bpm: '',
+    capo: '0',
+    sections: [{ name: 'イントロ', tab: EMPTY_TAB }],
+    notes: '',
+    created: now,
+    modified: now
+  };
+}
+
+function renderSongList() {
+  const q = document.getElementById('search-input').value.toLowerCase();
+  const list = document.getElementById('song-list');
+  list.innerHTML = '';
+  let count = 0;
+  songs.forEach((s, i) => {
+    const label = `${s.title} ${s.artist}`.toLowerCase();
+    if (q && !label.includes(q)) return;
+    count++;
+    const div = document.createElement('div');
+    div.className = 'song-item' + (i === currentIdx ? ' active' : '');
+    div.innerHTML = `<div>${esc(s.title)}</div>${s.artist ? '<div class="song-artist">' + esc(s.artist) + '</div>' : ''}`;
+    div.onclick = () => selectSong(i);
+    div.ondblclick = () => renameSongPrompt(i);
+    list.appendChild(div);
+  });
+  document.getElementById('song-count').textContent = count + ' 曲';
+}
+
+function selectSong(idx) {
+  if (dirty) saveCurrent(true);
+  currentIdx = idx;
+  currentSectionIdx = 0;
+  loadSongToEditor();
+  renderSongList();
+}
+
+function loadSongToEditor() {
+  if (currentIdx === null || !songs[currentIdx]) {
+    document.getElementById('empty-state').style.display = 'flex';
+    document.getElementById('editor-content').style.display = 'none';
+    return;
+  }
+  document.getElementById('empty-state').style.display = 'none';
+  document.getElementById('editor-content').style.display = 'flex';
+
+  const s = songs[currentIdx];
+  document.getElementById('inp-title').value = s.title;
+  document.getElementById('inp-artist').value = s.artist;
+  document.getElementById('inp-tuning').value = s.tuning;
+  document.getElementById('inp-bpm').value = s.bpm;
+  document.getElementById('inp-capo').value = s.capo;
+  document.getElementById('inp-notes').value = s.notes || '';
+
+  renderSections();
+  dirty = false;
+  updateStatus();
+}
+
+function renderSections() {
+  const bar = document.getElementById('section-bar');
+  const s = songs[currentIdx];
+  const addBtn = bar.querySelector('.section-add');
+  bar.innerHTML = '';
+  s.sections.forEach((sec, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'section-tab' + (i === currentSectionIdx ? ' active' : '');
+    btn.textContent = sec.name;
+    btn.onclick = () => switchSection(i);
+    bar.appendChild(btn);
+  });
+  bar.appendChild(addBtn || createAddBtn());
+
+  loadSection(currentSectionIdx);
+}
+
+function createAddBtn() {
+  const btn = document.createElement('button');
+  btn.className = 'section-add';
+  btn.textContent = '+ セクション追加';
+  btn.onclick = addSection;
+  return btn;
+}
+
+function switchSection(idx) {
+  flushTab();
+  currentSectionIdx = idx;
+  renderSections();
+}
+
+function loadSection(idx) {
+  const s = songs[currentIdx];
+  idx = Math.min(idx, s.sections.length - 1);
+  currentSectionIdx = idx;
+  document.getElementById('tab-editor').value = s.sections[idx].tab || EMPTY_TAB;
+}
+
+function flushTab() {
+  if (currentIdx === null) return;
+  const s = songs[currentIdx];
+  if (currentSectionIdx < s.sections.length) {
+    s.sections[currentSectionIdx].tab = document.getElementById('tab-editor').value;
+  }
+}
+
+function newSong() {
+  if (dirty) saveCurrent(true);
+  showModal('新しい曲', `
+    <input id="m-title" placeholder="曲名" value="新しい曲" autofocus>
+    <input id="m-artist" placeholder="アーティスト（省略可）">
+  `, () => {
+    const title = document.getElementById('m-title').value || '新しい曲';
+    const artist = document.getElementById('m-artist').value || '';
+    songs.push(newSongData(title, artist));
+    persistSongs();
+    selectSong(songs.length - 1);
+    closeModal();
+  });
+  setTimeout(() => { const el = document.getElementById('m-title'); if (el) el.select(); }, 100);
+}
+
+function saveCurrent(silent) {
+  if (currentIdx === null) return;
+  flushTab();
+  const s = songs[currentIdx];
+  s.title = document.getElementById('inp-title').value || '無題';
+  s.artist = document.getElementById('inp-artist').value;
+  s.tuning = document.getElementById('inp-tuning').value;
+  s.bpm = document.getElementById('inp-bpm').value;
+  s.capo = document.getElementById('inp-capo').value;
+  s.notes = document.getElementById('inp-notes').value;
+  s.modified = new Date().toISOString().slice(0, 10);
+  persistSongs();
+  dirty = false;
+  renderSongList();
+  if (!silent) setStatus('保存しました — ' + s.title);
+  updateStatus();
+}
+
+function deleteSong() {
+  if (currentIdx === null) return;
+  const title = songs[currentIdx].title;
+  if (!confirm(`「${title}」を削除しますか？\nこの操作は元に戻せません。`)) return;
+  songs.splice(currentIdx, 1);
+  persistSongs();
+  currentIdx = null;
+  currentSectionIdx = 0;
+  dirty = false;
+  loadSongToEditor();
+  renderSongList();
+  setStatus('削除しました');
+}
+
+function addSection() {
+  if (currentIdx === null) return;
+  const s = songs[currentIdx];
+  const defaultName = 'セクション ' + (s.sections.length + 1);
+  showModal('セクション追加', `
+    <input id="m-secname" placeholder="セクション名" value="${defaultName}" autofocus>
+  `, () => {
+    const name = document.getElementById('m-secname').value || defaultName;
+    flushTab();
+    s.sections.push({ name, tab: EMPTY_TAB });
+    currentSectionIdx = s.sections.length - 1;
+    renderSections();
+    markDirty();
+    closeModal();
+  });
+  setTimeout(() => { const el = document.getElementById('m-secname'); if (el) el.select(); }, 100);
+}
+
+function renameSectionPrompt() {
+  if (currentIdx === null) return;
+  const s = songs[currentIdx];
+  const old = s.sections[currentSectionIdx].name;
+  showModal('セクション名変更', `
+    <input id="m-secname" value="${esc(old)}" autofocus>
+  `, () => {
+    const name = document.getElementById('m-secname').value || old;
+    s.sections[currentSectionIdx].name = name;
+    renderSections();
+    markDirty();
+    closeModal();
+  });
+  setTimeout(() => { const el = document.getElementById('m-secname'); if (el) el.select(); }, 100);
+}
+
+function deleteSectionPrompt() {
+  if (currentIdx === null) return;
+  const s = songs[currentIdx];
+  if (s.sections.length <= 1) { alert('最後のセクションは削除できません。'); return; }
+  if (!confirm(`「${s.sections[currentSectionIdx].name}」を削除しますか？`)) return;
+  s.sections.splice(currentSectionIdx, 1);
+  currentSectionIdx = Math.min(currentSectionIdx, s.sections.length - 1);
+  renderSections();
+  markDirty();
+}
+
+function renameSongPrompt(idx) {
+  const s = songs[idx];
+  showModal('曲名変更', `
+    <input id="m-title" value="${esc(s.title)}" autofocus>
+  `, () => {
+    s.title = document.getElementById('m-title').value || s.title;
+    persistSongs();
+    renderSongList();
+    if (idx === currentIdx) document.getElementById('inp-title').value = s.title;
+    closeModal();
+  });
+  setTimeout(() => { const el = document.getElementById('m-title'); if (el) el.select(); }, 100);
+}
+
+function insertTemplate(type) {
+  if (currentIdx === null) return;
+  const ed = document.getElementById('tab-editor');
+  let text = '';
+  if (type === 'empty') text = '\n' + EMPTY_TAB + '\n';
+  else if (type === 'chord') text = '\n[ Chord: ___ ]\n';
+  else if (type === 'divider') text = '\n' + '─'.repeat(42) + '\n';
+
+  const pos = ed.selectionStart;
+  ed.value = ed.value.slice(0, pos) + text + ed.value.slice(pos);
+  ed.selectionStart = ed.selectionEnd = pos + text.length;
+  ed.focus();
+  markDirty();
+}
+
+function exportText() {
+  if (currentIdx === null) return;
+  saveCurrent(true);
+  const s = songs[currentIdx];
+  let lines = [
+    '=' .repeat(52),
+    '  ' + s.title,
+    '  ' + s.artist,
+    '  Tuning: ' + s.tuning + '  BPM: ' + s.bpm + '  Capo: ' + s.capo,
+    '='.repeat(52), ''
+  ];
+  s.sections.forEach(sec => {
+    lines.push('--- ' + sec.name + ' ---', '', sec.tab || '', '');
+  });
+  if (s.notes) lines.push('--- メモ ---', s.notes);
+
+  const blob = new Blob([lines.join('\n')], { type: 'text/plain;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = (s.title.replace(/[^a-zA-Z0-9　-鿿_-]/g, '') || 'tab') + '.txt';
+  a.click();
+  URL.revokeObjectURL(url);
+  setStatus('テキスト出力しました');
+}
+
+function markDirty() { dirty = true; updateStatus(); }
+
+function updateStatus() {
+  if (currentIdx === null) {
+    document.getElementById('status-text').textContent = '曲を選択してください';
+    document.getElementById('status-modified').textContent = '';
+    return;
+  }
+  const s = songs[currentIdx];
+  document.getElementById('status-text').textContent =
+    s.title + '  |  ' + s.tuning + '  |  更新: ' + s.modified;
+  document.getElementById('status-modified').textContent = dirty ? '● 未保存' : '';
+}
+
+function setStatus(msg) {
+  document.getElementById('status-text').textContent = msg;
+  setTimeout(updateStatus, 2000);
+}
+
+function showModal(title, body, onOk) {
+  document.getElementById('modal-content').innerHTML = `
+    <h3>${title}</h3>
+    ${body}
+    <div class="modal-btns">
+      <button class="modal-btn cancel" onclick="closeModal()">キャンセル</button>
+      <button class="modal-btn primary" id="modal-ok">OK</button>
+    </div>
+  `;
+  document.getElementById('modal').style.display = 'flex';
+  document.getElementById('modal-ok').onclick = onOk;
+  const firstInput = document.querySelector('#modal-content input');
+  if (firstInput) {
+    firstInput.addEventListener('keydown', e => { if (e.key === 'Enter') onOk(); });
+  }
+}
+
+function closeModal() {
+  document.getElementById('modal').style.display = 'none';
+}
+
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+document.getElementById('modal').addEventListener('click', e => {
+  if (e.target.id === 'modal') closeModal();
+});
+
+document.getElementById('tab-editor').addEventListener('input', markDirty);
+document.getElementById('inp-notes').addEventListener('input', markDirty);
+['inp-title','inp-artist','inp-tuning','inp-bpm','inp-capo'].forEach(id => {
+  document.getElementById(id).addEventListener('input', markDirty);
+  document.getElementById(id).addEventListener('change', markDirty);
+});
+
+document.addEventListener('keydown', e => {
+  if (e.ctrlKey && e.key === 's') { e.preventDefault(); saveCurrent(); }
+  if (e.ctrlKey && e.key === 'n') { e.preventDefault(); newSong(); }
+  if (e.key === 'Escape') closeModal();
+});
+
+document.getElementById('tab-editor').addEventListener('keydown', e => {
+  if (e.key === 'Tab') {
+    e.preventDefault();
+    const ed = e.target;
+    const start = ed.selectionStart;
+    ed.value = ed.value.slice(0, start) + '    ' + ed.value.slice(ed.selectionEnd);
+    ed.selectionStart = ed.selectionEnd = start + 4;
+    markDirty();
+  }
+});
+
+window.addEventListener('beforeunload', e => {
+  if (dirty) {
+    saveCurrent(true);
+  }
+});
+
+loadSongs();
+renderSongList();
+if (songs.length > 0) selectSong(0);
+else loadSongToEditor();
+</script>
+</body>
+</html>
