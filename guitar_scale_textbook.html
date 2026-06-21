@@ -1,0 +1,1088 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Guitar Scale 教科書 — アドリブへの道</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0d0d0d;--bg2:#151515;--bg3:#1c1c1c;--bg4:#252525;--bg5:#2e2e2e;
+  --border:#2a2a2a;--border2:#383838;
+  --text:#e8e8e8;--text2:#999;--text3:#5a5a5a;
+  --accent:#7c6cf0;--accent-bg:#1a1630;--accent-light:#a99df7;
+  --green:#3fcf7f;--green-bg:#0c2616;--green-border:#1a5035;
+  --red:#ef6b6b;--red-bg:#2a0e0e;--red-border:#5a1e1e;
+  --teal:#2cc4b0;--teal-bg:#0c201e;
+  --amber:#e8a820;--amber-bg:#201a08;
+  --blue:#5a9cf0;
+}
+html{scroll-behavior:smooth}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Helvetica Neue',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;font-size:14px;line-height:1.7}
+
+/* Sidebar */
+.sidebar{width:260px;background:var(--bg2);border-right:1px solid var(--border);position:fixed;top:0;left:0;bottom:0;overflow-y:auto;z-index:100;transition:transform .25s}
+.sidebar-header{padding:20px 16px 12px;border-bottom:1px solid var(--border)}
+.sidebar-header h1{font-size:15px;font-weight:600;color:var(--text);display:flex;align-items:center;gap:8px}
+.sidebar-header p{font-size:11px;color:var(--text3);margin-top:4px}
+.sidebar-progress{margin:12px 16px;padding:8px 12px;background:var(--bg3);border-radius:8px;font-size:12px;color:var(--text2)}
+.sidebar-progress .bar{height:3px;background:var(--bg5);border-radius:2px;margin-top:6px}
+.sidebar-progress .bar-fill{height:100%;background:var(--accent);border-radius:2px;transition:width .4s}
+.part-label{padding:12px 16px 4px;font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.1em}
+.ch-btn{display:flex;align-items:center;gap:10px;width:100%;padding:9px 16px;border:none;background:none;color:var(--text2);font-size:13px;text-align:left;cursor:pointer;transition:all .12s}
+.ch-btn:hover{background:var(--bg3);color:var(--text)}
+.ch-btn.active{background:var(--accent-bg);color:var(--accent-light);border-right:2px solid var(--accent)}
+.ch-btn .ch-num{width:22px;height:22px;border-radius:50%;background:var(--bg4);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;color:var(--text3);flex-shrink:0}
+.ch-btn.active .ch-num{background:var(--accent);color:#fff}
+.ch-btn.done .ch-num{background:var(--green);color:#000}
+
+/* Mobile menu */
+.menu-toggle{display:none;position:fixed;top:10px;left:10px;z-index:200;width:36px;height:36px;border-radius:8px;border:1px solid var(--border2);background:var(--bg2);color:var(--text);font-size:18px;cursor:pointer;align-items:center;justify-content:center}
+@media(max-width:800px){
+  .sidebar{transform:translateX(-100%)}
+  .sidebar.open{transform:translateX(0)}
+  .menu-toggle{display:flex}
+  .main{margin-left:0!important}
+  .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:90}
+  .overlay.show{display:block}
+}
+
+/* Main */
+.main{margin-left:260px;flex:1;min-height:100vh}
+.content{max-width:720px;margin:0 auto;padding:24px 20px 60px}
+
+/* Chapter header */
+.ch-header{margin-bottom:24px;padding-bottom:16px;border-bottom:1px solid var(--border)}
+.ch-header .part{font-size:11px;color:var(--accent);font-weight:600;letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px}
+.ch-header h2{font-size:22px;font-weight:600;color:var(--text);margin-bottom:4px}
+.ch-header .sub{font-size:13px;color:var(--text2)}
+
+/* Lesson content */
+.lesson-section{margin-bottom:28px}
+.lesson-section h3{font-size:16px;font-weight:600;color:var(--text);margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.lesson-section h3 .icon{font-size:14px;opacity:.6}
+.lesson p{font-size:14px;color:var(--text2);line-height:1.8;margin-bottom:10px}
+.lesson ul,.lesson ol{font-size:14px;color:var(--text2);line-height:1.8;padding-left:1.4em;margin-bottom:10px}
+.lesson li{margin-bottom:4px}
+.lesson strong{color:var(--text);font-weight:500}
+
+.info-box{padding:12px 16px;background:var(--bg3);border-radius:8px;border-left:3px solid var(--accent);margin:12px 0;font-size:13px;color:var(--text2);line-height:1.7}
+.info-box.tip{border-left-color:var(--green)}
+.info-box.warn{border-left-color:var(--amber)}
+.info-box .box-title{font-weight:600;color:var(--text);margin-bottom:4px;font-size:13px}
+
+.note-table{width:100%;border-collapse:collapse;margin:12px 0;font-size:13px}
+.note-table th{text-align:left;padding:8px 12px;background:var(--bg4);border-bottom:1px solid var(--border);color:var(--text3);font-weight:500;font-size:11px;text-transform:uppercase;letter-spacing:.05em}
+.note-table td{padding:8px 12px;border-bottom:1px solid var(--border);color:var(--text)}
+.note-table tr:last-child td{border-bottom:none}
+.note-table .hl{color:var(--accent-light);font-weight:500}
+.note-table code{background:var(--bg4);padding:2px 6px;border-radius:4px;font-size:12px;font-family:'Consolas','Monaco',monospace}
+
+.badge{display:inline-block;padding:2px 9px;border-radius:12px;font-size:11px;font-weight:500}
+.b-purple{background:var(--accent-bg);color:var(--accent-light)}
+.b-green{background:var(--green-bg);color:var(--green)}
+.b-amber{background:var(--amber-bg);color:var(--amber)}
+.b-teal{background:var(--teal-bg);color:var(--teal)}
+.b-red{background:var(--red-bg);color:var(--red)}
+
+/* Fretboard SVG */
+.fb-wrap{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:14px;overflow-x:auto;margin:12px 0}
+.fb-label{font-size:12px;color:var(--text3);margin-top:6px}
+
+/* Tab diagram */
+.tab-diagram{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:12px 16px;font-family:'Consolas','Monaco',monospace;font-size:13px;color:var(--text2);line-height:1.6;overflow-x:auto;margin:12px 0;white-space:pre}
+
+/* Quiz */
+.quiz-area{margin-top:20px}
+.quiz-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.quiz-header h3{font-size:16px;font-weight:600}
+.quiz-score{font-size:13px;color:var(--text2)}
+.quiz-score strong{color:var(--text)}
+.quiz-progress{height:3px;background:var(--bg5);border-radius:2px;margin-bottom:16px}
+.quiz-progress-fill{height:100%;background:var(--accent);border-radius:2px;transition:width .3s}
+.q-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.q-top{padding:18px 18px 14px;border-bottom:1px solid var(--border)}
+.q-label{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
+.q-text{font-size:17px;font-weight:500;color:var(--text);line-height:1.5}
+.q-choices{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:14px}
+.q-choice{padding:11px 14px;border:1px solid var(--border2);border-radius:8px;font-size:14px;cursor:pointer;background:var(--bg3);color:var(--text);text-align:left;transition:all .12s;line-height:1.4}
+.q-choice:hover:not([disabled]){background:var(--accent-bg);border-color:var(--accent);color:var(--accent-light)}
+.q-choice.correct{background:var(--green-bg)!important;border-color:var(--green-border)!important;color:var(--green)!important}
+.q-choice.wrong{background:var(--red-bg)!important;border-color:var(--red-border)!important;color:var(--red)!important}
+.q-choice[disabled]{cursor:default}
+.q-result{margin:0 14px 10px;padding:12px 14px;border-radius:8px;font-size:13px;line-height:1.6}
+.q-result.ok{background:var(--green-bg);color:#86efac;border:1px solid var(--green-border)}
+.q-result.ng{background:var(--red-bg);color:#fca5a5;border:1px solid var(--red-border)}
+.q-result .rl{font-weight:600;display:block;margin-bottom:4px}
+.q-next-wrap{padding:0 14px 14px}
+.q-next{padding:9px 18px;border:1px solid var(--accent);border-radius:8px;font-size:13px;cursor:pointer;background:var(--accent-bg);color:var(--accent-light);font-weight:500;transition:all .12s}
+.q-next:hover{background:var(--accent);color:#fff}
+.complete-banner{padding:20px;text-align:center;background:var(--green-bg);border:1px solid var(--green-border);border-radius:10px;margin:16px 0}
+.complete-banner h4{font-size:16px;color:var(--green);margin-bottom:6px}
+.complete-banner p{font-size:13px;color:#86efac}
+.ch-nav{display:flex;justify-content:space-between;margin-top:24px;padding-top:16px;border-top:1px solid var(--border)}
+.ch-nav button{padding:9px 18px;border:1px solid var(--border2);border-radius:8px;font-size:13px;cursor:pointer;background:var(--bg3);color:var(--text2);transition:all .12s}
+.ch-nav button:hover{background:var(--bg4);color:var(--text)}
+.ch-nav button.primary{background:var(--accent-bg);border-color:var(--accent);color:var(--accent-light)}
+.start-quiz-btn{display:inline-block;padding:10px 24px;border:1px solid var(--accent);border-radius:8px;font-size:14px;cursor:pointer;background:var(--accent-bg);color:var(--accent-light);font-weight:500;transition:all .12s;margin-top:8px}
+.start-quiz-btn:hover{background:var(--accent);color:#fff}
+.practice-list{list-style:none;padding:0;margin:8px 0}
+.practice-list li{padding:8px 12px;background:var(--bg3);border-radius:6px;margin-bottom:6px;font-size:13px;color:var(--text2);border-left:3px solid var(--teal)}
+.practice-list li strong{color:var(--text)}
+@media(max-width:600px){.q-choices{grid-template-columns:1fr}}
+
+/* Scale degree colors on fretboard */
+.root-dot{fill:var(--teal)}
+.scale-dot{fill:none;stroke:var(--teal);stroke-width:1.5}
+.ghost-dot{fill:#222;opacity:.5}
+</style>
+</head>
+<body>
+
+<button class="menu-toggle" onclick="toggleSidebar()">☰</button>
+<div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
+
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <h1>🎸 Guitar Scale 教科書</h1>
+    <p>アドリブ・ソロギターへの道</p>
+  </div>
+  <div class="sidebar-progress">
+    <span id="progress-label">進捗: 0 / 10 章</span>
+    <div class="bar"><div class="bar-fill" id="progress-bar" style="width:0%"></div></div>
+  </div>
+  <div class="part-label">Part 1 — 基礎知識</div>
+  <button class="ch-btn active" onclick="goTo(0)" id="sb-0"><span class="ch-num">1</span>音名と12音の世界</button>
+  <button class="ch-btn" onclick="goTo(1)" id="sb-1"><span class="ch-num">2</span>指板を覚える</button>
+  <button class="ch-btn" onclick="goTo(2)" id="sb-2"><span class="ch-num">3</span>インターバル</button>
+  <div class="part-label">Part 2 — スケールを学ぶ</div>
+  <button class="ch-btn" onclick="goTo(3)" id="sb-3"><span class="ch-num">4</span>メジャースケール</button>
+  <button class="ch-btn" onclick="goTo(4)" id="sb-4"><span class="ch-num">5</span>マイナースケール</button>
+  <button class="ch-btn" onclick="goTo(5)" id="sb-5"><span class="ch-num">6</span>ペンタトニック</button>
+  <button class="ch-btn" onclick="goTo(6)" id="sb-6"><span class="ch-num">7</span>ブルーススケール</button>
+  <div class="part-label">Part 3 — アドリブへ</div>
+  <button class="ch-btn" onclick="goTo(7)" id="sb-7"><span class="ch-num">8</span>モードスケール</button>
+  <button class="ch-btn" onclick="goTo(8)" id="sb-8"><span class="ch-num">9</span>コードトーン</button>
+  <button class="ch-btn" onclick="goTo(9)" id="sb-9"><span class="ch-num">10</span>アドリブ実践</button>
+  <div class="part-label" style="margin-top:8px">テスト</div>
+  <button class="ch-btn" onclick="goTo(10)" id="sb-10"><span class="ch-num">★</span>総合テスト</button>
+</nav>
+
+<div class="main">
+  <div class="content" id="main-content"></div>
+</div>
+
+<script>
+const N=['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+const NJP={C:'ド','C#':'ド#',D:'レ','D#':'レ#',E:'ミ',F:'ファ','F#':'ファ#',G:'ソ','G#':'ソ#',A:'ラ','A#':'ラ#',B:'シ'};
+const NALT={'C#':'D♭','D#':'E♭','F#':'G♭','G#':'A♭','A#':'B♭'};
+const STR=[4,9,2,7,11,4]; // 1弦E,2弦B,3弦G,4弦D,5弦A,6弦E (index)
+const STR_NAME=['1弦(E)','2弦(B)','3弦(G)','4弦(D)','5弦(A)','6弦(E)'];
+const SC={
+  major:[0,2,4,5,7,9,11],minor:[0,2,3,5,7,8,10],
+  penta_maj:[0,2,4,7,9],penta_min:[0,3,5,7,10],
+  blues:[0,3,5,6,7,10],dorian:[0,2,3,5,7,9,10],
+  mixolydian:[0,2,4,5,7,9,10],phrygian:[0,1,3,5,7,8,10],
+  lydian:[0,2,4,6,7,9,11]
+};
+const SC_NAME={major:'メジャースケール',minor:'ナチュラルマイナー',penta_maj:'メジャーペンタトニック',penta_min:'マイナーペンタトニック',blues:'ブルーススケール',dorian:'ドリアン',mixolydian:'ミクソリディアン',phrygian:'フリジアン',lydian:'リディアン'};
+const SC_FORM={major:'全全半全全全半',minor:'全半全全半全全',penta_maj:'全全1.5全1.5',penta_min:'1.5全全1.5全',blues:'1.5全半半1.5全',dorian:'全半全全全半全',mixolydian:'全全半全全半全'};
+const IV=[
+  {n:'完全1度',semi:0},{n:'短2度',semi:1},{n:'長2度',semi:2},{n:'短3度',semi:3},
+  {n:'長3度',semi:4},{n:'完全4度',semi:5},{n:'減5度/増4度',semi:6},{n:'完全5度',semi:7},
+  {n:'短6度',semi:8},{n:'長6度',semi:9},{n:'短7度',semi:10},{n:'長7度',semi:11},{n:'完全8度',semi:12}
+];
+
+const PENTA_BOXES_A = [
+  {name:'Box 1（基本）',frets:[[5,8],[5,8],[5,7],[5,7],[5,7],[5,8]]},
+  {name:'Box 2',frets:[[8,10],[8,10],[7,9],[7,10],[7,10],[8,10]]},
+  {name:'Box 3',frets:[[10,12],[10,13],[9,12],[10,12],[10,12],[10,12]]},
+  {name:'Box 4',frets:[[12,15],[13,15],[12,14],[12,14],[12,15],[12,15]]},
+  {name:'Box 5',frets:[[3,5],[3,5],[2,5],[2,5],[3,5],[3,5]]}
+];
+
+let currentCh=0;
+let completed=JSON.parse(localStorage.getItem('gst_done')||'{}');
+
+function rand(a){return a[Math.floor(Math.random()*a.length)]}
+function randInt(a,b){return a+Math.floor(Math.random()*(b-a+1))}
+function shuffle(a){let r=[...a];for(let i=r.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[r[i],r[j]]=[r[j],r[i]]}return r}
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+function scaleNotes(root,type){const ri=N.indexOf(root);return SC[type].map(s=>N[(ri+s)%12]);}
+
+function toggleSidebar(){
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('overlay').classList.toggle('show');
+}
+
+function updateProgress(){
+  const done=Object.keys(completed).filter(k=>completed[k]).length;
+  document.getElementById('progress-label').textContent=`進捗: ${done} / 10 章`;
+  document.getElementById('progress-bar').style.width=(done/10*100)+'%';
+  for(let i=0;i<10;i++){
+    const btn=document.getElementById('sb-'+i);
+    btn.classList.toggle('done',!!completed[i]);
+  }
+}
+
+function markDone(ch){
+  completed[ch]=true;
+  localStorage.setItem('gst_done',JSON.stringify(completed));
+  updateProgress();
+}
+
+function goTo(ch){
+  currentCh=ch;
+  document.querySelectorAll('.ch-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('sb-'+ch).classList.add('active');
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('overlay').classList.remove('show');
+  renderChapter(ch);
+  window.scrollTo(0,0);
+}
+
+// ===== Fretboard SVG builder =====
+function buildFretboard(opts={}){
+  const {highlight=[],root=null,startFret=0,endFret=12,showAll=false,boxNotes=null,width=660}=opts;
+  const frets=endFret-startFret;
+  const H=170,pL=42,pR=14,pT=26,pB=20;
+  const fw=(width-pL-pR)/frets;
+  const sh=(H-pT-pB)/5;
+  const strOpen=['E','B','G','D','A','E'];
+  let s=`<svg viewBox="0 0 ${width} ${H}" xmlns="http://www.w3.org/2000/svg" style="min-width:${Math.min(width,500)}px;width:100%">`;
+  for(let f=0;f<=frets;f++){
+    const x=pL+f*fw;const af=f+startFret;
+    s+=`<line x1="${x}" y1="${pT}" x2="${x}" y2="${H-pB}" stroke="#333" stroke-width="${af===0?2.5:.5}"/>`;
+  }
+  for(let st=0;st<6;st++){
+    const y=pT+st*sh;
+    s+=`<line x1="${pL}" y1="${y}" x2="${width-pR}" y2="${y}" stroke="#555" stroke-width="${.4+st*.2}"/>`;
+    s+=`<text x="${pL-5}" y="${y+4}" text-anchor="end" font-size="9" fill="#555">${strOpen[st]}</text>`;
+  }
+  [3,5,7,9,12,15,17].filter(f=>f>startFret&&f<=endFret).forEach(f=>{
+    const x=pL+(f-startFret-.5)*fw;
+    if(f===12){s+=`<circle cx="${x}" cy="${pT+sh*1.5}" r="2.5" fill="#2a2a2a"/><circle cx="${x}" cy="${pT+sh*3.5}" r="2.5" fill="#2a2a2a"/>`;
+    }else{s+=`<circle cx="${x}" cy="${H/2}" r="2.5" fill="#2a2a2a"/>`;}
+    s+=`<text x="${x}" y="${H-3}" text-anchor="middle" font-size="9" fill="#444">${f}</text>`;
+  });
+
+  const highlightSet=new Set(highlight.map(n=>N.indexOf(n)));
+  const rootIdx=root?N.indexOf(root):-1;
+
+  for(let st=0;st<6;st++){
+    const base=STR[st];
+    for(let f=startFret;f<=endFret;f++){
+      const ni=(base+f)%12;
+      const fx=pL+(f===startFret&&startFret===0?-12:(f-startFret)*fw-fw/2);
+      if(f===startFret&&startFret>0) continue;
+      const y=pT+st*sh;
+      const isRoot=ni===rootIdx;
+      const inScale=highlightSet.has(ni);
+
+      if(boxNotes){
+        const bx=boxNotes[st];
+        if(bx&&bx.includes(f)){
+          if(isRoot){
+            s+=`<circle cx="${fx}" cy="${y}" r="10" fill="#2cc4b0"/>`;
+            s+=`<text x="${fx}" y="${y+4}" text-anchor="middle" font-size="10" fill="#000" font-weight="700">${N[ni]}</text>`;
+          }else{
+            s+=`<circle cx="${fx}" cy="${y}" r="9" fill="none" stroke="#2cc4b0" stroke-width="1.5"/>`;
+            s+=`<text x="${fx}" y="${y+4}" text-anchor="middle" font-size="9" fill="#ccc">${N[ni]}</text>`;
+          }
+        }else{
+          s+=`<circle cx="${fx}" cy="${y}" r="3" fill="#1a1a1a" opacity=".3"/>`;
+        }
+      }else if(isRoot){
+        s+=`<circle cx="${fx}" cy="${y}" r="10" fill="#2cc4b0"/>`;
+        s+=`<text x="${fx}" y="${y+4}" text-anchor="middle" font-size="10" fill="#000" font-weight="700">${N[ni]}</text>`;
+      }else if(inScale){
+        s+=`<circle cx="${fx}" cy="${y}" r="9" fill="none" stroke="#2cc4b0" stroke-width="1.5"/>`;
+        s+=`<text x="${fx}" y="${y+4}" text-anchor="middle" font-size="9" fill="#ccc">${N[ni]}</text>`;
+      }else if(showAll){
+        s+=`<circle cx="${fx}" cy="${y}" r="8" fill="#151515" stroke="#2a2a2a" stroke-width=".5"/>`;
+        s+=`<text x="${fx}" y="${y+4}" text-anchor="middle" font-size="8" fill="#444">${N[ni]}</text>`;
+      }else{
+        s+=`<circle cx="${fx}" cy="${y}" r="3" fill="#1a1a1a" opacity=".3"/>`;
+      }
+    }
+  }
+  s+='</svg>';
+  return s;
+}
+
+function buildBoxDiagram(box,rootNote){
+  const ri=N.indexOf(rootNote);
+  const allFrets=box.frets.flat();
+  const minF=Math.min(...allFrets);
+  const maxF=Math.max(...allFrets);
+  const boxMap=box.frets.map(pair=>[...new Set(pair)]);
+  return buildFretboard({highlight:scaleNotes(rootNote,'penta_min'),root:rootNote,startFret:Math.max(0,minF-1),endFret:maxF+1,boxNotes:boxMap});
+}
+
+// ===== Quiz Engine =====
+let quizState={questions:[],idx:0,score:0,total:0};
+
+function startQuiz(questions,chIdx){
+  quizState={questions:shuffle(questions).slice(0,Math.min(questions.length,10)),idx:0,score:0,total:0,chIdx};
+  renderQuizQ();
+}
+
+function renderQuizQ(){
+  const qs=quizState.questions;
+  if(quizState.idx>=qs.length){
+    const pct=Math.round(quizState.score/qs.length*100);
+    let msg=pct>=80?'素晴らしい！この章の内容をしっかり理解しています。':pct>=60?'あと少し！もう一度レッスンを読み返してみましょう。':'まだ理解が浅い部分があります。レッスンを復習してからもう一度挑戦しましょう。';
+    if(pct>=80&&quizState.chIdx!==undefined&&quizState.chIdx<10) markDone(quizState.chIdx);
+    document.getElementById('quiz-container').innerHTML=`
+      <div class="complete-banner">
+        <h4>${pct>=80?'🎉 合格！':'📝 もう少し！'}</h4>
+        <p>${quizState.score} / ${qs.length} 正解（${pct}%）— ${msg}</p>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:12px">
+        <button class="start-quiz-btn" onclick="startQuiz(CH_QUIZZES[${quizState.chIdx}],${quizState.chIdx})">もう一度</button>
+        ${quizState.chIdx<9?`<button class="start-quiz-btn" style="background:var(--bg3);border-color:var(--border2);color:var(--text2)" onclick="goTo(${quizState.chIdx+1})">次の章へ →</button>`:''}
+      </div>`;
+    return;
+  }
+  const q=qs[quizState.idx];
+  document.getElementById('quiz-container').innerHTML=`
+    <div class="quiz-header">
+      <h3>理解度チェック</h3>
+      <span class="quiz-score">問 ${quizState.idx+1}/${qs.length}　正解 <strong>${quizState.score}</strong></span>
+    </div>
+    <div class="quiz-progress"><div class="quiz-progress-fill" style="width:${quizState.idx/qs.length*100}%"></div></div>
+    <div class="q-card">
+      <div class="q-top">
+        <div class="q-label">${q.label||''}</div>
+        <div class="q-text">${q.q}</div>
+      </div>
+      <div class="q-choices" id="qchoices">
+        ${q.choices.map((c,i)=>`<button class="q-choice" onclick="quizAnswer(${i})" id="qc${i}">${esc(c)}</button>`).join('')}
+      </div>
+      <div id="q-res"></div>
+      <div id="q-next-w" style="display:none" class="q-next-wrap"><button class="q-next" onclick="quizNext()">次へ →</button></div>
+    </div>`;
+}
+
+function quizAnswer(idx){
+  const q=quizState.questions[quizState.idx];
+  if(document.querySelector('.q-choice[disabled]'))return;
+  const chosen=q.choices[idx];
+  const ok=chosen===q.ans;
+  if(ok)quizState.score++;
+  quizState.total++;
+  document.querySelectorAll('.q-choice').forEach((b,i)=>{
+    b.disabled=true;
+    if(q.choices[i]===q.ans)b.classList.add('correct');
+    else if(i===idx&&!ok)b.classList.add('wrong');
+  });
+  document.getElementById('q-res').innerHTML=`<div class="q-result ${ok?'ok':'ng'}"><span class="rl">${ok?'✓ 正解！':'✗ 不正解'}</span>${q.ex||''}</div>`;
+  document.getElementById('q-next-w').style.display='block';
+}
+function quizNext(){quizState.idx++;renderQuizQ();}
+
+// ===== Chapter Quiz Data =====
+function makeQ(label,q,ans,wrongs,ex){return{label,q,ans,choices:shuffle([ans,...wrongs]),ex};}
+
+function genCh0Quiz(){
+  const qs=[];
+  // Note name questions
+  N.forEach(n=>{
+    qs.push(makeQ('音名',`${n} の日本語読みは？`,NJP[n],shuffle(Object.values(NJP).filter(v=>v!==NJP[n])).slice(0,3),`${n} = ${NJP[n]}`));
+  });
+  ['C','D','E','F','G','A','B'].forEach(n=>{
+    qs.push(makeQ('音名',`${NJP[n]} の英語表記は？`,n,shuffle(N.filter(x=>x!==n&&!x.includes('#'))).slice(0,3),`${NJP[n]} = ${n}`));
+  });
+  qs.push(makeQ('基礎','1オクターブは何半音？','12',['7','10','14'],'1オクターブ = 12半音。ギターでは12フレット。'));
+  qs.push(makeQ('基礎','EとFの間は何音？','半音',['全音','1.5音','2音'],'EとF、BとCの間だけ半音。他は全音。'));
+  qs.push(makeQ('基礎','全音は何フレット分？','2フレット',['1フレット','3フレット','4フレット'],'全音=2半音=2フレット'));
+  return qs;
+}
+
+function genCh1Quiz(){
+  const qs=[];
+  qs.push(makeQ('指板','6弦の開放弦は？','E',['A','D','G'],'6弦(最も太い弦)の開放弦はE'));
+  qs.push(makeQ('指板','5弦の開放弦は？','A',['E','D','G'],'5弦の開放弦はA'));
+  qs.push(makeQ('指板','ギターの開放弦(低→高)の順番は？','E A D G B E',['E A D G B D','E B D G A E','A D G B E A'],'覚え方:「家でジービーイー」'));
+  qs.push(makeQ('指板','12フレットを押さえると？','開放弦の1オクターブ上の同じ音',['全く別の音','開放弦と同じ高さの音','2オクターブ上の音'],'12フレット=12半音=1オクターブ'));
+  for(let i=0;i<4;i++){
+    const st=randInt(0,5);const f=randInt(1,11);
+    const ni=(STR[st]+f)%12;const ans=N[ni];
+    const w=shuffle(N.filter(x=>x!==ans)).slice(0,3);
+    qs.push(makeQ('指板',`${STR_NAME[st]} の ${f}フレットは？`,ans,w,`開放弦${N[STR[st]]}から${f}半音上=${ans}`));
+  }
+  return qs;
+}
+
+function genCh2Quiz(){
+  const qs=[];
+  [[3,'短3度'],[4,'長3度'],[5,'完全4度'],[7,'完全5度'],[10,'短7度'],[12,'完全8度']].forEach(([semi,name])=>{
+    const w=shuffle(IV.filter(x=>x.semi!==semi)).slice(0,3).map(x=>x.n);
+    qs.push(makeQ('インターバル',`${semi}半音の音程は？`,name,w,`${semi}半音 = ${name}`));
+    qs.push(makeQ('インターバル',`${name}は何半音？`,semi+'半音',shuffle(IV.filter(x=>x.semi!==semi)).slice(0,3).map(x=>x.semi+'半音'),`${name} = ${semi}半音`));
+  });
+  qs.push(makeQ('インターバル','メジャーコードの3rdは？','長3度（4半音）',['短3度（3半音）','完全5度（7半音）','完全4度（5半音）'],'メジャーの明るさ=長3度'));
+  qs.push(makeQ('インターバル','マイナーコードの3rdは？','短3度（3半音）',['長3度（4半音）','短2度（1半音）','長2度（2半音）'],'マイナーの暗さ=短3度'));
+  return qs;
+}
+
+function genCh3Quiz(){
+  const qs=[];
+  qs.push(makeQ('メジャー','メジャースケールのフォーミュラは？','全全半全全全半',['全半全全半全全','全全全半全全半','半全全全半全全'],'ドレミファソラシド=全全半全全全半'));
+  qs.push(makeQ('メジャー','Cメジャースケールの構成音は？','C D E F G A B',['C D E F# G A B','C D Eb F G Ab Bb','C D E F G A Bb'],'Cメジャー=白鍵のみ'));
+  ['G','D','A','E','F'].forEach(r=>{
+    const t=scaleNotes(r,'major');
+    const w=shuffle(N.filter(x=>x!==r)).slice(0,3).map(wr=>scaleNotes(wr,'major').join(' '));
+    qs.push(makeQ('メジャー',`${r}メジャースケールの構成音は？`,t.join(' '),w,`${r}メジャー: ${t.join(' ')}`));
+  });
+  qs.push(makeQ('メジャー','メジャースケールで半音になる場所は？','3-4度間と7-8度間',['1-2度間と5-6度間','2-3度間と6-7度間','4-5度間と7-8度間'],'ミファ(3-4)とシド(7-8)が半音'));
+  return qs;
+}
+
+function genCh4Quiz(){
+  const qs=[];
+  qs.push(makeQ('マイナー','ナチュラルマイナースケールのフォーミュラは？','全半全全半全全',['全全半全全全半','半全全半全全全','全全半全全半全'],''));
+  qs.push(makeQ('マイナー','Aナチュラルマイナーの構成音は？','A B C D E F G',['A B C# D E F G','A B C D E F# G','A Bb C D Eb F G'],'Amナチュラル=白鍵のみ（Cメジャーと同じ音）'));
+  qs.push(makeQ('マイナー','Aマイナーの平行調は？','Cメジャー',['Gメジャー','Dメジャー','Eメジャー'],'短3度上のメジャーキーが平行調'));
+  qs.push(makeQ('マイナー','Eマイナーの平行調は？','Gメジャー',['Cメジャー','Dメジャー','Aメジャー'],'Em→短3度上=Gメジャー'));
+  ['E','D','B'].forEach(r=>{
+    const t=scaleNotes(r,'minor');
+    const w=shuffle(N.filter(x=>x!==r)).slice(0,3).map(wr=>scaleNotes(wr,'minor').join(' '));
+    qs.push(makeQ('マイナー',`${r}ナチュラルマイナーの構成音は？`,t.join(' '),w,`${r}マイナー: ${t.join(' ')}`));
+  });
+  qs.push(makeQ('マイナー','メジャーとマイナーの違いで最も重要なのは？','3度が長3度か短3度か',['5度が完全か減か','7度が長か短か','2度が長か短か'],'3rdの違いが明暗を決める'));
+  return qs;
+}
+
+function genCh5Quiz(){
+  const qs=[];
+  qs.push(makeQ('ペンタ','マイナーペンタトニックは何音？','5音',['6音','7音','4音'],'ペンタ=5'));
+  qs.push(makeQ('ペンタ','Aマイナーペンタの構成音は？','A C D E G',['A B C D E','A C D F G','A B D E G'],'Am penta: R ♭3 4 5 ♭7'));
+  qs.push(makeQ('ペンタ','マイナーペンタの度数は？','R ♭3 4 5 ♭7',['R 2 3 5 6','R ♭3 4 ♭5 ♭7','R 2 ♭3 5 ♭7'],''));
+  qs.push(makeQ('ペンタ','メジャーペンタの度数は？','R 2 3 5 6',['R ♭3 4 5 ♭7','R 2 4 5 7','R 2 3 4 5'],''));
+  qs.push(makeQ('ペンタ','Aマイナーペンタの最も有名なポジション(Box 1)は何フレット付近？','5フレット',['3フレット','7フレット','10フレット'],'Am penta Box1=5フレット'));
+  qs.push(makeQ('ペンタ','CメジャーペンタとAマイナーペンタの関係は？','同じ音（平行調）',['全く違う音','1音だけ違う','3度ずれている'],'Cメジャーペンタ(C D E G A)=Amペンタ(A C D E G)'));
+  ['E','D','G'].forEach(r=>{
+    const t=scaleNotes(r,'penta_min');
+    const w=shuffle(N.filter(x=>x!==r)).slice(0,3).map(wr=>scaleNotes(wr,'penta_min').join(' '));
+    qs.push(makeQ('ペンタ',`${r}マイナーペンタの構成音は？`,t.join(' '),w,`${r}m penta: ${t.join(' ')}`));
+  });
+  return qs;
+}
+
+function genCh6Quiz(){
+  const qs=[];
+  qs.push(makeQ('ブルース','ブルーススケールはペンタトニックに何を加えたもの？','♭5（ブルーノート）',['♭2','♯4と♭7','♭6'],'ペンタ+♭5=ブルーススケール'));
+  qs.push(makeQ('ブルース','Aブルーススケールの構成音は？','A C D D# E G',['A C D E F G','A B C D E G','A C D E G A'],'Am penta(A C D E G)+D#(♭5)'));
+  qs.push(makeQ('ブルース','ブルーススケールは何音？','6音',['5音','7音','8音'],'ペンタ5音+ブルーノート1音=6音'));
+  qs.push(makeQ('ブルース','ブルーノートの音程は？','減5度（♭5）',['短3度（♭3）','短7度（♭7）','短2度（♭2）'],''));
+  ['E','G','D'].forEach(r=>{
+    const t=scaleNotes(r,'blues');
+    const w=shuffle(N.filter(x=>x!==r)).slice(0,3).map(wr=>scaleNotes(wr,'blues').join(' '));
+    qs.push(makeQ('ブルース',`${r}ブルーススケールの構成音は？`,t.join(' '),w,`${r} blues: ${t.join(' ')}`));
+  });
+  return qs;
+}
+
+function genCh7Quiz(){
+  const qs=[];
+  qs.push(makeQ('モード','ドリアンスケールのフォーミュラは？','全半全全全半全',['全全半全全全半','全半全全半全全','全全半全全半全'],''));
+  qs.push(makeQ('モード','ドリアンとナチュラルマイナーの違いは？','6度が長6度（半音高い）',['3度が長3度','7度が長7度','2度が短2度'],'ドリアン=マイナー+♮6'));
+  qs.push(makeQ('モード','ミクソリディアンとメジャーの違いは？','7度が短7度（半音低い）',['3度が短3度','5度が減5度','6度が短6度'],'ミクソリディアン=メジャー+♭7'));
+  qs.push(makeQ('モード','ミクソリディアンが最も相性が良いコードは？','ドミナント7th（属7）',['マイナー7th','メジャー7th','ディミニッシュ'],''));
+  qs.push(makeQ('モード','Dドリアンの構成音は？','D E F G A B C',['D E F# G A B C','D E F G A Bb C','D Eb F G A Bb C'],'Dドリアン=白鍵のみ'));
+  qs.push(makeQ('モード','Gミクソリディアンの構成音は？','G A B C D E F',['G A B C D E F#','G A Bb C D Eb F','G A B C# D E F'],'Gミクソ=白鍵のみ'));
+  return qs;
+}
+
+function genCh8Quiz(){
+  const qs=[];
+  const chordTypes=[
+    {name:'メジャー',f:[0,4,7]},{name:'マイナー',f:[0,3,7]},
+    {name:'dom7',f:[0,4,7,10]},{name:'maj7',f:[0,4,7,11]},{name:'m7',f:[0,3,7,10]}
+  ];
+  ['C','G','A','E','D'].forEach(root=>{
+    const ct=rand(chordTypes);
+    const ri=N.indexOf(root);
+    const tones=ct.f.map(s=>N[(ri+s)%12]).join(' ');
+    const wRoots=shuffle(N.filter(n=>n!==root)).slice(0,3);
+    const w=wRoots.map(r=>ct.f.map(s=>N[(N.indexOf(r)+s)%12]).join(' '));
+    qs.push(makeQ('コード',`${root}${ct.name}の構成音は？`,tones,w,`${root}${ct.name}: ${tones}`));
+  });
+  qs.push(makeQ('コードトーン','アドリブでコードトーンを使う理由は？','コードの響きに溶け込む安定した音だから',['速く弾けるから','音が大きいから','簡単だから'],''));
+  qs.push(makeQ('コードトーン','Cmaj7上でのターゲットノートとして最適なのは？','C E G B（コードトーン）',['C# D# F# G#','D F A','Eb Gb Bb'],''));
+  return qs;
+}
+
+function genCh9Quiz(){
+  const qs=[];
+  qs.push(makeQ('アドリブ','アドリブ初心者が最初に覚えるべきスケールは？','マイナーペンタトニック',['メジャースケール','ドリアンモード','ブルーススケール'],'5音でシンプル。まずこれを全ポジションで弾けるようにする'));
+  qs.push(makeQ('アドリブ','「コール＆レスポンス」とは？','フレーズを投げかけて答えるように弾くこと',['2人で同時に弾くこと','同じフレーズを繰り返すこと','コードを鳴らしてからソロを弾くこと'],''));
+  qs.push(makeQ('アドリブ','フレーズに「間（ま）」を作る意味は？','聴き手に消化する時間を与え、緊張と緩和を作る',['弾けない部分をごまかす','テンポを遅くする','他の楽器を聴くため'],''));
+  qs.push(makeQ('アドリブ','ペンタトニックの次に学ぶべきことは？','ブルーノートの追加とコードトーンの意識',['全く新しいスケールを10個覚える','速弾きの練習','譜面の読み方'],''));
+  qs.push(makeQ('アドリブ','Key=Amの曲でアドリブするとき、最も基本的なスケールは？','Aマイナーペンタトニック',['Cマイナーペンタトニック','Aメジャースケール','Eブルーススケール'],''));
+  qs.push(makeQ('アドリブ','チョーキングの主な効果は？','音程を滑らかに上げて感情表現する',['音量を上げる','テンポを変える','音色を歪ませる'],''));
+  return qs;
+}
+
+const CH_QUIZZES=[genCh0Quiz,genCh1Quiz,genCh2Quiz,genCh3Quiz,genCh4Quiz,genCh5Quiz,genCh6Quiz,genCh7Quiz,genCh8Quiz,genCh9Quiz];
+
+// ===== Chapter Content =====
+function renderChapter(ch){
+  const el=document.getElementById('main-content');
+  if(ch===10){renderComprehensiveTest(el);return;}
+  const renderers=[renderCh0,renderCh1,renderCh2,renderCh3,renderCh4,renderCh5,renderCh6,renderCh7,renderCh8,renderCh9];
+  renderers[ch](el);
+}
+
+function chapterTemplate(partLabel,title,sub,lessonHTML,practiceHTML,chIdx){
+  return`
+  <div class="ch-header">
+    <div class="part">${partLabel}</div>
+    <h2>第${chIdx+1}章: ${title}</h2>
+    <div class="sub">${sub}</div>
+  </div>
+  <div class="lesson">${lessonHTML}</div>
+  <div class="lesson-section">
+    <h3>🎯 練習メニュー</h3>
+    <ul class="practice-list">${practiceHTML}</ul>
+  </div>
+  <div class="lesson-section">
+    <h3>✅ 理解度チェック</h3>
+    <p style="font-size:13px;color:var(--text2);margin-bottom:10px">80%以上正解で合格です。</p>
+    <button class="start-quiz-btn" onclick="startQuiz(CH_QUIZZES[${chIdx}](),${chIdx})">クイズを始める</button>
+    <div id="quiz-container" style="margin-top:16px"></div>
+  </div>
+  <div class="ch-nav">
+    ${chIdx>0?`<button onclick="goTo(${chIdx-1})">← 前の章</button>`:'<span></span>'}
+    ${chIdx<9?`<button class="primary" onclick="goTo(${chIdx+1})">次の章 →</button>`:`<button class="primary" onclick="goTo(10)">総合テスト へ →</button>`}
+  </div>`;
+}
+
+function renderCh0(el){
+  el.innerHTML=chapterTemplate('Part 1 — 基礎知識','音名と12音の世界','音楽の「アルファベット」を覚えよう',`
+  <div class="lesson-section">
+    <h3>🎵 12個の音</h3>
+    <p>西洋音楽は<strong>12個の音</strong>の繰り返しでできています。ピアノの白鍵7つ＋黒鍵5つ。ギターでは<strong>12フレットで1周</strong>して同じ音に戻ります。</p>
+    <table class="note-table">
+      <tr><th>英語</th><th>日本語</th><th>半音数</th><th>備考</th></tr>
+      ${N.map((n,i)=>`<tr><td class="hl">${n}</td><td>${NJP[n]}</td><td>${i}</td><td>${NALT[n]?'= '+NALT[n]+' (異名同音)':n==='E'||n==='B'?'次の音と半音':'次の音と全音'}</td></tr>`).join('')}
+    </table>
+  </div>
+  <div class="lesson-section">
+    <h3>📏 全音と半音</h3>
+    <p><strong>半音</strong> = ギターの<strong>1フレット分</strong>。最小の音の距離。</p>
+    <p><strong>全音</strong> = ギターの<strong>2フレット分</strong> = 半音2つ分。</p>
+    <div class="info-box">
+      <div class="box-title">重要ルール</div>
+      ほとんどの隣り合う音は全音（2フレット）離れていますが、<strong>E↔F</strong> と <strong>B↔C</strong> だけは<strong>半音（1フレット）</strong>です。これは絶対に覚えてください。
+    </div>
+  </div>
+  <div class="lesson-section">
+    <h3>🔄 異名同音（エンハーモニック）</h3>
+    <p>同じ音でも2つの呼び方がある音があります。例えば <strong>C#</strong> と <strong>D♭</strong> は全く同じ音です。</p>
+    <p>どちらを使うかは文脈（キーやスケール）で決まりますが、今は「同じ音に2つの名前がある」ことだけ覚えればOKです。</p>
+    <table class="note-table">
+      <tr><th>シャープ表記</th><th>フラット表記</th></tr>
+      ${Object.entries(NALT).map(([s,f])=>`<tr><td>${s}</td><td>${f}</td></tr>`).join('')}
+    </table>
+  </div>`,`
+  <li><strong>音名を声に出して唱える:</strong> C D E F G A B... を10回繰り返す</li>
+  <li><strong>日本語↔英語の変換:</strong> ドレミ→CDE、CDE→ドレミを素早く言えるようにする</li>
+  <li><strong>E-FとB-Cが半音:</strong> この2箇所を確実に覚える</li>`,0);
+}
+
+function renderCh1(el){
+  el.innerHTML=chapterTemplate('Part 1 — 基礎知識','指板を覚える','ギターのどこにどの音があるかを把握しよう',`
+  <div class="lesson-section">
+    <h3>🎸 開放弦の音</h3>
+    <p>ギターの6本の弦を何も押さえずに鳴らした音（開放弦）を覚えましょう。</p>
+    <table class="note-table">
+      <tr><th>弦</th><th>音名</th><th>覚え方</th></tr>
+      <tr><td>6弦（最も太い）</td><td class="hl">E（ミ）</td><td>低いE</td></tr>
+      <tr><td>5弦</td><td class="hl">A（ラ）</td><td></td></tr>
+      <tr><td>4弦</td><td class="hl">D（レ）</td><td></td></tr>
+      <tr><td>3弦</td><td class="hl">G（ソ）</td><td></td></tr>
+      <tr><td>2弦</td><td class="hl">B（シ）</td><td></td></tr>
+      <tr><td>1弦（最も細い）</td><td class="hl">E（ミ）</td><td>高いE（6弦の2オクターブ上）</td></tr>
+    </table>
+    <div class="info-box tip">
+      <div class="box-title">覚え方</div>
+      低い方から「<strong>E A D G B E</strong>」→「<strong>家(いえ)でジービーイー</strong>」や「<strong>Eat All Day, Go to Bed Early</strong>」
+    </div>
+  </div>
+  <div class="lesson-section">
+    <h3>📍 指板の全体像</h3>
+    <p>開放弦から12フレットまでの全ての音を見てみましょう。</p>
+    <div class="fb-wrap">${buildFretboard({showAll:true})}</div>
+    <p>1フレット押さえるごとに<strong>半音ずつ上がり</strong>、12フレットで元の音（1オクターブ上）に戻ります。</p>
+  </div>
+  <div class="lesson-section">
+    <h3>💡 効率的な覚え方</h3>
+    <ol>
+      <li><strong>6弦と5弦を最優先で覚える</strong> — コードのルート音やスケールの起点になる</li>
+      <li><strong>ポジションマークを利用</strong> — 3,5,7,9,12フレットにある点を目印にする</li>
+      <li><strong>オクターブの関係を使う</strong> — 6弦と4弦は2フレットずらすと同じ音。5弦と3弦も同様</li>
+      <li><strong>CとFの位置</strong> — #がつかない音（特にCとF）の位置を覚えると他も推測できる</li>
+    </ol>
+    <div class="info-box">
+      <div class="box-title">6弦の重要ポジション</div>
+      <code>0=E  1=F  3=G  5=A  7=B  8=C  10=D  12=E</code><br>
+      これを覚えるだけで、バレーコードやスケールの起点がわかる！
+    </div>
+  </div>`,`
+  <li><strong>6弦の音名を言う:</strong> 0→12フレットまで順番に音名を声に出して言う</li>
+  <li><strong>5弦も同様に:</strong> 5弦を全フレット覚える</li>
+  <li><strong>ランダム指板テスト:</strong> ランダムな弦・フレットを指差して即答する練習</li>
+  <li><strong>1日1弦:</strong> 毎日1本の弦に集中して、1週間で全弦をカバー</li>`,1);
+}
+
+function renderCh2(el){
+  el.innerHTML=chapterTemplate('Part 1 — 基礎知識','インターバル（音程）','音と音の「距離」を理解する — スケール・コードの基盤',`
+  <div class="lesson-section">
+    <h3>📐 インターバルとは</h3>
+    <p>インターバル（音程）は、<strong>2つの音の距離</strong>のことです。ギターでは<strong>フレット数</strong>で数えられます。</p>
+    <p>全てのスケールとコードは、インターバルの組み合わせで説明できます。これを理解すると、どんなスケールも「暗記」ではなく「理解」できます。</p>
+  </div>
+  <div class="lesson-section">
+    <h3>📊 インターバル一覧</h3>
+    <table class="note-table">
+      <tr><th>度数</th><th>半音数</th><th>例(C基準)</th><th>ギターでの重要度</th></tr>
+      <tr><td>完全1度（ルート）</td><td>0</td><td>C→C</td><td><span class="badge b-green">基本</span></td></tr>
+      <tr><td>短2度</td><td>1</td><td>C→C#</td><td><span class="badge b-amber">緊張</span></td></tr>
+      <tr><td>長2度</td><td>2</td><td>C→D</td><td></td></tr>
+      <tr><td class="hl">短3度</td><td class="hl">3</td><td>C→D#</td><td><span class="badge b-purple">★マイナー</span></td></tr>
+      <tr><td class="hl">長3度</td><td class="hl">4</td><td>C→E</td><td><span class="badge b-purple">★メジャー</span></td></tr>
+      <tr><td>完全4度</td><td>5</td><td>C→F</td><td><span class="badge b-teal">sus4</span></td></tr>
+      <tr><td>減5度（トライトーン）</td><td>6</td><td>C→F#</td><td><span class="badge b-red">ブルーノート</span></td></tr>
+      <tr><td class="hl">完全5度</td><td class="hl">7</td><td>C→G</td><td><span class="badge b-green">★パワーコード</span></td></tr>
+      <tr><td>短6度</td><td>8</td><td>C→G#</td><td></td></tr>
+      <tr><td>長6度</td><td>9</td><td>C→A</td><td></td></tr>
+      <tr><td class="hl">短7度</td><td class="hl">10</td><td>C→A#</td><td><span class="badge b-purple">★7thコード</span></td></tr>
+      <tr><td>長7度</td><td>11</td><td>C→B</td><td><span class="badge b-teal">maj7</span></td></tr>
+      <tr><td>完全8度</td><td>12</td><td>C→C(高)</td><td><span class="badge b-green">オクターブ</span></td></tr>
+    </table>
+  </div>
+  <div class="lesson-section">
+    <h3>🔑 最優先で覚える4つ</h3>
+    <div class="info-box">
+      <div class="box-title">この4つがわかれば世界が変わる</div>
+      <strong>短3度(3半音)</strong> → マイナーの響き<br>
+      <strong>長3度(4半音)</strong> → メジャーの響き<br>
+      <strong>完全5度(7半音)</strong> → 最も安定。パワーコード<br>
+      <strong>短7度(10半音)</strong> → 7thコード。ブルース感
+    </div>
+    <p>コードの「メジャー」「マイナー」の違いは、<strong>3度が長(4半音)か短(3半音)か</strong>、たったこれだけです。</p>
+  </div>`,`
+  <li><strong>指板上でインターバルを見つける:</strong> 同じ弦上でルートから3,4,5,7,10フレット上の音を確認</li>
+  <li><strong>パワーコードの形を確認:</strong> ルート+5度（7フレット上 or 隣の弦の2フレット上）</li>
+  <li><strong>メジャー/マイナーの聴き比べ:</strong> 長3度と短3度の響きの違いを耳で覚える</li>`,2);
+}
+
+function renderCh3(el){
+  const cMaj=scaleNotes('C','major');
+  const gMaj=scaleNotes('G','major');
+  el.innerHTML=chapterTemplate('Part 2 — スケールを学ぶ','メジャースケール','全てのスケールの基準。「ドレミファソラシド」の正体',`
+  <div class="lesson-section">
+    <h3>🎹 メジャースケールとは</h3>
+    <p>メジャースケールは<strong>全全半全全全半</strong>（W W H W W W H）というパターンで7音を並べたスケールです。いわゆる「ドレミファソラシド」。明るく安定した響きが特徴です。</p>
+    <div class="info-box">
+      <div class="box-title">フォーミュラ</div>
+      <strong>全 - 全 - 半 - 全 - 全 - 全 - 半</strong><br>
+      全音=2フレット、半音=1フレット<br>
+      半音になるのは <strong>3→4度</strong>（ミ→ファ）と <strong>7→8度</strong>（シ→ド）の2箇所だけ
+    </div>
+  </div>
+  <div class="lesson-section">
+    <h3>🎵 Cメジャースケール</h3>
+    <p>最もシンプルなメジャースケール。<strong>#も♭もつかない（白鍵だけ）</strong>。</p>
+    <p><strong>${cMaj.join(' - ')}</strong></p>
+    <div class="fb-wrap">${buildFretboard({highlight:cMaj,root:'C'})}</div>
+    <p class="fb-label">● ルート(C) / ○ スケール音</p>
+  </div>
+  <div class="lesson-section">
+    <h3>🎵 Gメジャースケール</h3>
+    <p>ギターでよく使うキー。F#が1つだけ入ります。</p>
+    <p><strong>${gMaj.join(' - ')}</strong></p>
+    <div class="fb-wrap">${buildFretboard({highlight:gMaj,root:'G'})}</div>
+  </div>
+  <div class="lesson-section">
+    <h3>📝 各キーのメジャースケール</h3>
+    <table class="note-table">
+      <tr><th>キー</th><th>構成音</th></tr>
+      ${['C','G','D','A','E','F'].map(r=>`<tr><td class="hl">${r}</td><td><code>${scaleNotes(r,'major').join('  ')}</code></td></tr>`).join('')}
+    </table>
+  </div>
+  <div class="lesson-section">
+    <h3>🎯 なぜメジャースケールが重要か</h3>
+    <ul>
+      <li>他の全てのスケールは<strong>メジャースケールとの差分</strong>で説明できる</li>
+      <li>コード理論の基盤（ダイアトニックコード）</li>
+      <li>インターバルの基準（「3度」「5度」はメジャースケールの度数）</li>
+    </ul>
+  </div>`,`
+  <li><strong>Cメジャースケールを弾く:</strong> 開放弦ポジションで上下行を繰り返す</li>
+  <li><strong>Gメジャースケールを弾く:</strong> 3フレット付近のポジションで</li>
+  <li><strong>フォーミュラの暗唱:</strong> 「全全半全全全半」を覚える</li>
+  <li><strong>任意のキーで構成音を言う:</strong> 例えば「Dメジャー」と言われてすぐ音を言えるようにする</li>`,3);
+}
+
+function renderCh4(el){
+  const aMin=scaleNotes('A','minor');
+  const eMin=scaleNotes('E','minor');
+  el.innerHTML=chapterTemplate('Part 2 — スケールを学ぶ','マイナースケール','暗く哀愁のある響き。メジャーとの関係を理解する',`
+  <div class="lesson-section">
+    <h3>🌙 ナチュラルマイナースケールとは</h3>
+    <p>マイナースケールは<strong>全半全全半全全</strong>のパターンで並べた7音スケール。暗い・哀愁のある響きが特徴です。</p>
+    <div class="info-box">
+      <div class="box-title">メジャーとの違い（度数で比較）</div>
+      メジャー: R 2 <strong>3</strong> 4 5 <strong>6 7</strong><br>
+      マイナー: R 2 <strong>♭3</strong> 4 5 <strong>♭6 ♭7</strong><br>
+      → 3度・6度・7度が半音低い（♭がつく）
+    </div>
+  </div>
+  <div class="lesson-section">
+    <h3>🎵 Aナチュラルマイナー</h3>
+    <p>最もシンプルなマイナースケール。<strong>Cメジャーと全く同じ音</strong>（白鍵のみ）ですが、Aから始めることで暗い響きになります。</p>
+    <p><strong>${aMin.join(' - ')}</strong></p>
+    <div class="fb-wrap">${buildFretboard({highlight:aMin,root:'A'})}</div>
+  </div>
+  <div class="lesson-section">
+    <h3>🔗 平行調（Relative Key）</h3>
+    <p>同じ構成音でも、起点（ルート）が違うとメジャーにもマイナーにもなります。この関係を<strong>平行調</strong>と言います。</p>
+    <table class="note-table">
+      <tr><th>マイナーキー</th><th>平行調のメジャーキー</th><th>共通の構成音</th></tr>
+      <tr><td>Am</td><td class="hl">C</td><td>A B C D E F G</td></tr>
+      <tr><td>Em</td><td class="hl">G</td><td>E F# G A B C D</td></tr>
+      <tr><td>Dm</td><td class="hl">F</td><td>D E F G A A# C</td></tr>
+      <tr><td>Bm</td><td class="hl">D</td><td>B C# D E F# G A</td></tr>
+    </table>
+    <div class="info-box tip">
+      <div class="box-title">平行調の見つけ方</div>
+      マイナーキーの<strong>短3度上(3フレット上)</strong>がメジャーの平行調。<br>
+      例: Am → 3半音上 → <strong>C</strong>メジャー
+    </div>
+  </div>
+  <div class="lesson-section">
+    <h3>🎵 Eマイナースケール</h3>
+    <p>ギターで弾きやすいキー。開放弦を活用できます。</p>
+    <p><strong>${eMin.join(' - ')}</strong></p>
+    <div class="fb-wrap">${buildFretboard({highlight:eMin,root:'E'})}</div>
+  </div>`,`
+  <li><strong>Aマイナースケールを弾く:</strong> 5フレット付近のポジションで上下行</li>
+  <li><strong>明暗の切り替え:</strong> Cメジャー→Aマイナーを連続で弾いて響きの違いを体感</li>
+  <li><strong>平行調の計算:</strong> ランダムなキーの平行調をすぐ言えるようにする</li>`,4);
+}
+
+function renderCh5(el){
+  const amPenta=scaleNotes('A','penta_min');
+  const emPenta=scaleNotes('E','penta_min');
+  const cmPenta=scaleNotes('C','penta_maj');
+  el.innerHTML=chapterTemplate('Part 2 — スケールを学ぶ','ペンタトニックスケール','アドリブの最重要スケール。これだけで曲が弾ける！',`
+  <div class="lesson-section">
+    <h3>⭐ ペンタトニックとは</h3>
+    <p>ペンタ（=5）トニック（=音）。たった<strong>5つの音</strong>で構成されるスケールです。音が少ない分、<strong>どの音を弾いても外れにくく</strong>、アドリブの出発点として最適です。</p>
+    <div class="info-box warn">
+      <div class="box-title">最重要ポイント</div>
+      ギターソロ・アドリブを弾きたいなら、<strong>マイナーペンタトニック</strong>を最初にマスターしてください。ロック、ブルース、ポップスの大半のソロはペンタトニックがベースです。
+    </div>
+  </div>
+  <div class="lesson-section">
+    <h3>🎵 マイナーペンタトニック</h3>
+    <p>ナチュラルマイナーから4度と♭2度を省いた5音スケール。</p>
+    <div class="info-box">
+      <div class="box-title">度数</div>
+      <strong>R - ♭3 - 4 - 5 - ♭7</strong>（1.5全 全 全 1.5全 全）
+    </div>
+    <p>Aマイナーペンタ: <strong>${amPenta.join(' - ')}</strong></p>
+    <div class="fb-wrap">${buildFretboard({highlight:amPenta,root:'A'})}</div>
+  </div>
+  <div class="lesson-section">
+    <h3>📦 5つのボックスポジション（Am Penta）</h3>
+    <p>ペンタトニックは指板上の5つのポジション（ボックス）に分けて覚えます。まず<strong>Box 1</strong>を完璧にしてから他に進みましょう。</p>
+    ${PENTA_BOXES_A.map((box,i)=>`
+      <div style="margin:16px 0">
+        <h4 style="font-size:14px;color:var(--accent-light);margin-bottom:6px">${box.name} ${i===0?'← まずこれ！':''}</h4>
+        <div class="fb-wrap">${buildBoxDiagram(box,'A')}</div>
+      </div>
+    `).join('')}
+    <div class="info-box tip">
+      <div class="box-title">練習の順番</div>
+      Box 1 → Box 2 → Box 5 → Box 3 → Box 4 の順がおすすめ。<br>
+      Box 1だけでも十分アドリブできます！まずBox 1を上下に何度も往復しましょう。
+    </div>
+  </div>
+  <div class="lesson-section">
+    <h3>🎵 メジャーペンタトニック</h3>
+    <p>メジャースケールから4度と7度を省いた5音。明るいアドリブに使います。</p>
+    <div class="info-box">
+      <div class="box-title">度数</div>
+      <strong>R - 2 - 3 - 5 - 6</strong>
+    </div>
+    <p>Cメジャーペンタ: <strong>${cmPenta.join(' - ')}</strong></p>
+    <p>実は<strong>CメジャーペンタとAマイナーペンタは同じ音</strong>です（平行調の関係）。使い分けはルート音の意識次第。</p>
+  </div>`,`
+  <li><strong>Am Penta Box 1 を100回弾く:</strong> 上行→下行を繰り返す。指が自然に動くまで</li>
+  <li><strong>バッキングトラックで弾く:</strong> YouTubeで「Am backing track」を検索して合わせて弾く</li>
+  <li><strong>Box 1 → Box 2 の接続:</strong> 2つのポジション間をスムーズに移動する練習</li>
+  <li><strong>Em Penta も弾く:</strong> 開放弦を使えるので弾きやすい</li>`,5);
+}
+
+function renderCh6(el){
+  const aBlues=scaleNotes('A','blues');
+  const eBlues=scaleNotes('E','blues');
+  el.innerHTML=chapterTemplate('Part 2 — スケールを学ぶ','ブルーススケール','ペンタ+1音でブルース感が劇的にアップ',`
+  <div class="lesson-section">
+    <h3>🎸 ブルーススケールとは</h3>
+    <p>マイナーペンタトニックに<strong>♭5（ブルーノート）</strong>を1音追加したスケールです。たった1音の追加で、ブルースやロックの<strong>泥臭さ・色気</strong>が加わります。</p>
+    <div class="info-box">
+      <div class="box-title">度数</div>
+      <strong>R - ♭3 - 4 - ♭5 - 5 - ♭7</strong>（6音）<br>
+      ペンタ: R ♭3 4 <span style="color:var(--red)">___</span> 5 ♭7<br>
+      ブルース: R ♭3 4 <span style="color:var(--red)">♭5</span> 5 ♭7 ← ここに1音追加
+    </div>
+  </div>
+  <div class="lesson-section">
+    <h3>🎵 Aブルーススケール</h3>
+    <p><strong>${aBlues.join(' - ')}</strong></p>
+    <p>Aマイナーペンタ(A C D E G)に<strong>D#(=E♭)</strong>を加えたもの。</p>
+    <div class="fb-wrap">${buildFretboard({highlight:aBlues,root:'A'})}</div>
+  </div>
+  <div class="lesson-section">
+    <h3>🎵 Eブルーススケール</h3>
+    <p><strong>${eBlues.join(' - ')}</strong></p>
+    <div class="fb-wrap">${buildFretboard({highlight:eBlues,root:'E'})}</div>
+  </div>
+  <div class="lesson-section">
+    <h3>💡 ブルーノートの使い方</h3>
+    <p>♭5は<strong>経過音</strong>として使うのがコツです。</p>
+    <ul>
+      <li><strong>4度→♭5→5度</strong> と半音で駆け上がる（クロマチックラン）</li>
+      <li>♭5に<strong>チョーキング</strong>して5度に持ち上げる</li>
+      <li>長く伸ばすのではなく、<strong>通過するように</strong>使うと効果的</li>
+    </ul>
+    <div class="info-box tip">
+      <div class="box-title">実践のコツ</div>
+      ペンタで弾いていて「もう少し味が欲しい」と思ったら♭5を混ぜる。最初はペンタのフレーズの中に1箇所だけ♭5を入れてみましょう。
+    </div>
+  </div>`,`
+  <li><strong>ペンタのフレーズに♭5を混ぜる:</strong> まずBox 1のペンタフレーズに♭5を1音足す</li>
+  <li><strong>4→♭5→5 のクロマチックラン:</strong> この動きを体に染み込ませる</li>
+  <li><strong>ブルース12小節で弾く:</strong> YouTubeで「blues backing track in A」を検索</li>`,6);
+}
+
+function renderCh7(el){
+  const dDorian=scaleNotes('D','dorian');
+  const gMixo=scaleNotes('G','mixolydian');
+  el.innerHTML=chapterTemplate('Part 3 — アドリブへ','モードスケール入門','ドリアンとミクソリディアン — アドリブの幅を広げる',`
+  <div class="lesson-section">
+    <h3>🌈 モードとは</h3>
+    <p>モードとは、メジャースケールの<strong>開始音を変えた</strong>スケールです。同じ音の並びでも、出発点が変わると響きが変わります。</p>
+    <p>7つのモードがありますが、ギタリストがアドリブで特に使うのは<strong>ドリアン</strong>と<strong>ミクソリディアン</strong>です。</p>
+  </div>
+  <div class="lesson-section">
+    <h3>🎵 ドリアンモード</h3>
+    <p>ナチュラルマイナーの<strong>6度を半音上げた</strong>スケール。マイナーだけど少し明るい、洗練された響き。</p>
+    <div class="info-box">
+      <div class="box-title">ドリアンの度数</div>
+      <strong>R 2 ♭3 4 5 6 ♭7</strong>（全半全全全半全）<br>
+      マイナーとの違い: 6度が♭6→♮6（半音上がる）<br>
+      使用場面: <strong>マイナー系コード(m7)のアドリブ</strong>、ジャズ、ファンク
+    </div>
+    <p>Dドリアン: <strong>${dDorian.join(' - ')}</strong>（Cメジャースケールの音をDから並べたもの）</p>
+    <div class="fb-wrap">${buildFretboard({highlight:dDorian,root:'D'})}</div>
+  </div>
+  <div class="lesson-section">
+    <h3>🎵 ミクソリディアンモード</h3>
+    <p>メジャースケールの<strong>7度を半音下げた</strong>スケール。メジャーの明るさにブルース的な色が加わります。</p>
+    <div class="info-box">
+      <div class="box-title">ミクソリディアンの度数</div>
+      <strong>R 2 3 4 5 6 ♭7</strong>（全全半全全半全）<br>
+      メジャーとの違い: 7度が7→♭7（半音下がる）<br>
+      使用場面: <strong>ドミナント7thコード(7)</strong>上のアドリブ、ロック、ファンク
+    </div>
+    <p>Gミクソリディアン: <strong>${gMixo.join(' - ')}</strong>（Cメジャースケールの音をGから並べたもの）</p>
+    <div class="fb-wrap">${buildFretboard({highlight:gMixo,root:'G'})}</div>
+  </div>
+  <div class="lesson-section">
+    <h3>📋 モード選びの早見表</h3>
+    <table class="note-table">
+      <tr><th>コードタイプ</th><th>使えるスケール</th><th>サウンド</th></tr>
+      <tr><td>メジャー / maj7</td><td class="hl">メジャースケール / リディアン</td><td>明るい・安定</td></tr>
+      <tr><td>マイナー / m7</td><td class="hl">ドリアン / ナチュラルマイナー</td><td>暗い・洗練</td></tr>
+      <tr><td>ドミナント7th</td><td class="hl">ミクソリディアン</td><td>明るい+ブルージー</td></tr>
+      <tr><td>全般（ロック/ブルース）</td><td class="hl">ペンタトニック / ブルース</td><td>万能</td></tr>
+    </table>
+  </div>`,`
+  <li><strong>Dドリアンを弾く:</strong> Dm7コード上でDドリアンスケールを弾く</li>
+  <li><strong>Gミクソリディアンを弾く:</strong> G7コード上でGミクソリディアンを弾く</li>
+  <li><strong>ペンタとモードの比較:</strong> 同じコード上でペンタ→モードを切り替えて弾いてみる</li>`,7);
+}
+
+function renderCh8(el){
+  el.innerHTML=chapterTemplate('Part 3 — アドリブへ','コードトーンとターゲットノート','スケールを「なぞる」から「意味を持って弾く」へ',`
+  <div class="lesson-section">
+    <h3>🎯 コードトーンとは</h3>
+    <p>コードトーンは、<strong>そのコードを構成している音</strong>です。コード進行の上でコードトーンを意識して弾くと、ソロが<strong>コードに溶け込み</strong>、音楽的に聴こえます。</p>
+    <table class="note-table">
+      <tr><th>コード</th><th>構成音（コードトーン）</th><th>度数</th></tr>
+      <tr><td class="hl">C</td><td>C E G</td><td>R 3 5</td></tr>
+      <tr><td class="hl">Am</td><td>A C E</td><td>R ♭3 5</td></tr>
+      <tr><td class="hl">G7</td><td>G B D F</td><td>R 3 5 ♭7</td></tr>
+      <tr><td class="hl">Dm7</td><td>D F A C</td><td>R ♭3 5 ♭7</td></tr>
+      <tr><td class="hl">Fmaj7</td><td>F A C E</td><td>R 3 5 7</td></tr>
+    </table>
+  </div>
+  <div class="lesson-section">
+    <h3>🎵 コードトーンを指板で見る</h3>
+    <p>Am のコードトーン (A, C, E):</p>
+    <div class="fb-wrap">${buildFretboard({highlight:['A','C','E'],root:'A'})}</div>
+    <p>G7 のコードトーン (G, B, D, F):</p>
+    <div class="fb-wrap">${buildFretboard({highlight:['G','B','D','F'],root:'G'})}</div>
+  </div>
+  <div class="lesson-section">
+    <h3>🔑 ターゲットノート戦略</h3>
+    <p>コードが変わるタイミングで<strong>そのコードのコードトーンに着地する</strong>のが「ターゲットノート」です。</p>
+    <div class="info-box">
+      <div class="box-title">実践方法</div>
+      1. コード進行を把握する（例: Am → Dm → G → C）<br>
+      2. 各コードの<strong>3度か5度</strong>をターゲットにする<br>
+      3. スケールで自由に弾きつつ、コードチェンジの瞬間にターゲットに着地<br>
+      4. 間の音はペンタトニックで繋ぐ
+    </div>
+    <p>例: Am→Dm→G→Cの進行では</p>
+    <table class="note-table">
+      <tr><th>コード</th><th>ターゲット候補</th><th>理由</th></tr>
+      <tr><td>Am</td><td class="hl">C(♭3) or E(5)</td><td>マイナーの色を出す</td></tr>
+      <tr><td>Dm</td><td class="hl">F(♭3) or A(5)</td><td>Dm感を強調</td></tr>
+      <tr><td>G</td><td class="hl">B(3) or D(5)</td><td>メジャー感</td></tr>
+      <tr><td>C</td><td class="hl">E(3) or G(5)</td><td>解決感</td></tr>
+    </table>
+  </div>
+  <div class="lesson-section">
+    <h3>📈 段階的なアプローチ</h3>
+    <ol>
+      <li><strong>ステージ1:</strong> ペンタだけで弾く（コード無視でOK）</li>
+      <li><strong>ステージ2:</strong> コードのルート音を意識して弾く</li>
+      <li><strong>ステージ3:</strong> コードトーン（特に3度）をターゲットにする</li>
+      <li><strong>ステージ4:</strong> スケールチェンジ（コードごとにモードを変える）</li>
+    </ol>
+  </div>`,`
+  <li><strong>Amのコードトーンを指板上で弾く:</strong> A C E だけを探して弾いてみる</li>
+  <li><strong>コード進行の上でルートだけを弾く:</strong> コードチェンジのタイミングを体で覚える</li>
+  <li><strong>コードチェンジ時に3度に着地する:</strong> ペンタで弾きながら、チェンジの瞬間だけ3度を狙う</li>`,8);
+}
+
+function renderCh9(el){
+  el.innerHTML=chapterTemplate('Part 3 — アドリブへ','アドリブ実践ガイド','学んだ知識を「演奏」に変える',`
+  <div class="lesson-section">
+    <h3>🗺 アドリブ・ロードマップ</h3>
+    <p>ここまで学んだ知識を使って、実際にアドリブができるようになるためのステップです。</p>
+    <table class="note-table">
+      <tr><th>ステップ</th><th>内容</th><th>期間目安</th></tr>
+      <tr><td class="hl">Step 1</td><td>Am Penta Box 1 を自由に弾ける</td><td>1-2週間</td></tr>
+      <tr><td class="hl">Step 2</td><td>バッキングトラックに合わせてBox 1で弾く</td><td>2-4週間</td></tr>
+      <tr><td class="hl">Step 3</td><td>ブルーノートを混ぜる</td><td>1-2週間</td></tr>
+      <tr><td class="hl">Step 4</td><td>Box 2, 5 を追加して移動する</td><td>2-4週間</td></tr>
+      <tr><td class="hl">Step 5</td><td>コードトーンを意識して弾く</td><td>4-8週間</td></tr>
+      <tr><td class="hl">Step 6</td><td>フレーズ（リック）を覚えて引用する</td><td>継続</td></tr>
+      <tr><td class="hl">Step 7</td><td>モードを使い分ける</td><td>継続</td></tr>
+    </table>
+  </div>
+  <div class="lesson-section">
+    <h3>🎤 フレーズの作り方</h3>
+    <p>アドリブは「全ての音をランダムに弾く」ことではありません。<strong>フレーズ（短いメロディの塊）</strong>を組み合わせて作ります。</p>
+    <div class="info-box">
+      <div class="box-title">フレーズ構築の5原則</div>
+      1. <strong>繰り返し:</strong> 同じフレーズを2-3回繰り返すと印象に残る<br>
+      2. <strong>変化:</strong> 繰り返した後に少し変えると展開になる<br>
+      3. <strong>間（ま）:</strong> 弾かない時間が音楽に呼吸を与える<br>
+      4. <strong>上昇→下降:</strong> 上がって下がる山形が自然な流れ<br>
+      5. <strong>着地:</strong> フレーズの終わりはコードトーンかルートに着地
+    </div>
+  </div>
+  <div class="lesson-section">
+    <h3>🔧 テクニック — 表現力を上げる</h3>
+    <table class="note-table">
+      <tr><th>テクニック</th><th>効果</th><th>使い方</th></tr>
+      <tr><td class="hl">チョーキング</td><td>音程を滑らかに上げる</td><td>ペンタの♭3→3度、4→5度でよく使う</td></tr>
+      <tr><td class="hl">ビブラート</td><td>音を揺らして感情を込める</td><td>ロングトーンの終わりに</td></tr>
+      <tr><td class="hl">ハンマリング/プリング</td><td>滑らかな音の繋がり</td><td>ペンタのボックス内で多用</td></tr>
+      <tr><td class="hl">スライド</td><td>ポジション移動・表現</td><td>ボックス間の移動に</td></tr>
+      <tr><td class="hl">ミュート</td><td>リズム・パーカッシブ</td><td>フレーズの区切りに</td></tr>
+    </table>
+  </div>
+  <div class="lesson-section">
+    <h3>🎧 コール＆レスポンス</h3>
+    <p>アドリブの最も基本的な構造は<strong>「問いかけ→応答」</strong>です。</p>
+    <ul>
+      <li><strong>コール（問いかけ）:</strong> 短いフレーズを弾く（2-4音、上行系が多い）</li>
+      <li><strong>間:</strong> 少し待つ</li>
+      <li><strong>レスポンス（応答）:</strong> コールに応えるフレーズを弾く（下行系や着地が多い）</li>
+    </ul>
+    <p>歌うように「フレーズ→休み→フレーズ→休み」を繰り返すのがコツです。</p>
+  </div>
+  <div class="lesson-section">
+    <h3>📋 Key別チートシート</h3>
+    <p>よく使うキーでのアドリブスケール早見表：</p>
+    <table class="note-table">
+      <tr><th>Key</th><th>まず使うスケール</th><th>ボックス起点</th><th>追加で使える</th></tr>
+      <tr><td class="hl">Am / C</td><td>Am Penta</td><td>5フレット</td><td>Aブルース, Dドリアン</td></tr>
+      <tr><td class="hl">Em / G</td><td>Em Penta</td><td>開放弦/12フレット</td><td>Eブルース, Gメジャーペンタ</td></tr>
+      <tr><td class="hl">Dm / F</td><td>Dm Penta</td><td>10フレット</td><td>Dブルース, Dドリアン</td></tr>
+      <tr><td class="hl">Bm / D</td><td>Bm Penta</td><td>7フレット</td><td>Bブルース</td></tr>
+      <tr><td class="hl">Gm / B♭</td><td>Gm Penta</td><td>3フレット</td><td>Gブルース</td></tr>
+    </table>
+  </div>
+  <div class="lesson-section">
+    <h3>🎯 ソロギターへの発展</h3>
+    <p>ソロギター（コードとメロディを1人で弾く）は、ここまでの知識の上に成り立ちます。</p>
+    <ol>
+      <li><strong>コードフォームの中でメロディを弾く</strong> — コードを押さえながら1弦・2弦でメロディを弾く</li>
+      <li><strong>ベース音とメロディの分離</strong> — 親指でベース（ルート・5度）、他の指でメロディ</li>
+      <li><strong>コードトーンでメロディを構築</strong> — コードトーンを繋いでメロディを作る</li>
+      <li><strong>ペンタの音を経過音として使う</strong> — コードトーン間をペンタの音で埋める</li>
+    </ol>
+    <div class="info-box tip">
+      <div class="box-title">ソロギターの第一歩</div>
+      まず好きな曲のメロディを単音で弾いてみる → 次にルート音（ベース）を足す → 最後にコードフォームを意識する。この順番で取り組むと自然に上達します。
+    </div>
+  </div>`,`
+  <li><strong>毎日10分のペンタ練習:</strong> バッキングトラックに合わせてBox 1でアドリブ</li>
+  <li><strong>好きなギタリストのフレーズを1つコピー:</strong> 耳コピでもTAB譜でもOK</li>
+  <li><strong>コール＆レスポンスの練習:</strong> 2小節弾いて2小節休む、を繰り返す</li>
+  <li><strong>録音して聴く:</strong> スマホで自分のアドリブを録音して客観的に聴く</li>
+  <li><strong>チョーキングとビブラートの練習:</strong> 1音を美しく鳴らす練習</li>`,9);
+}
+
+// ===== Comprehensive Test =====
+function renderComprehensiveTest(el){
+  const allQs=[];
+  for(let i=0;i<10;i++){
+    const gen=CH_QUIZZES[i]();
+    const picked=shuffle(gen).slice(0,3);
+    picked.forEach(q=>{q.label=`Ch.${i+1} ${q.label}`;});
+    allQs.push(...picked);
+  }
+  el.innerHTML=`
+    <div class="ch-header">
+      <div class="part">総合テスト</div>
+      <h2>全10章の理解度チェック</h2>
+      <div class="sub">各章から出題。全体の理解度を測りましょう。</div>
+    </div>
+    <p style="font-size:14px;color:var(--text2);margin-bottom:16px">全${allQs.length}問。80%以上で合格です。</p>
+    <button class="start-quiz-btn" onclick="startCompTest()">テスト開始</button>
+    <div id="quiz-container" style="margin-top:16px"></div>`;
+  window._compTestQs=allQs;
+}
+function startCompTest(){
+  quizState={questions:shuffle(window._compTestQs),idx:0,score:0,total:0,chIdx:10};
+  renderQuizQ();
+}
+
+// ===== Init =====
+updateProgress();
+renderChapter(0);
+</script>
+</body>
+</html>
