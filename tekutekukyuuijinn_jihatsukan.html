@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>採用情報(児童発達支援管理責任者)｜児童発達支援・放課後等デイサービス てくてく</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  /* ── トップページ(index.html)と同じ配色変数 ── */
+  --yellow:#ffca02;
+  --yellow-deep:#e5b401;
+  --black:#1d1a14;
+  --white:#fffdf5;
+  --cream:#fff8e0;
+  --paw:#8a8578;
+  --orange:#e8611c;
+  --dark:#211d15;
+  --dark-line:#4a4436;
+  --radius:14px;
+}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Hiragino Maru Gothic ProN','Hiragino Sans','BIZ UDPGothic','Noto Sans JP',sans-serif;
+  background:var(--yellow);
+  color:var(--black);
+  line-height:1.8;
+}
+
+/* ─── 戻るリンク ─── */
+.back-bar{max-width:960px;margin:0 auto;padding:18px 24px 0}
+.back-link{font-size:13px;font-weight:800;color:var(--black);text-decoration:none;background:var(--white);padding:8px 18px;border-radius:20px;box-shadow:0 2px 8px rgba(80,60,0,.15);display:inline-block;transition:transform .12s}
+.back-link:hover{transform:translateY(-2px)}
+
+/* ─── ヒーロー ─── */
+.hero{text-align:center;padding:36px 24px 42px;position:relative}
+.small-paw{width:min(110px,30vw);height:auto;margin:0 auto 4px;display:block;opacity:.9}
+.logo-img{width:min(320px,80vw);height:auto;margin:0 auto 8px;display:block;border-radius:10px}
+.hero .facility-name{font-size:clamp(12px,2.6vw,15px);font-weight:800;letter-spacing:.1em}
+.hero h1{font-size:clamp(22px,4.8vw,34px);font-weight:800;letter-spacing:.14em;margin:4px 0 18px}
+.hero .copy{font-size:clamp(14px,3vw,18px);font-weight:800;margin-bottom:10px}
+.hero .copy-sub{font-size:clamp(12px,2.5vw,14px);font-weight:600;max-width:520px;margin:0 auto 22px}
+.hero-tags{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.hero-tag{background:var(--white);border-radius:20px;font-size:12px;font-weight:700;padding:5px 14px;box-shadow:0 2px 8px rgba(80,60,0,.12)}
+
+/* ─── レイアウト ─── */
+.main{max-width:960px;margin:0 auto;padding:20px 24px 60px}
+.section{margin-bottom:48px}
+.sec-heading{text-align:center;font-size:18px;font-weight:800;letter-spacing:.16em;margin-bottom:6px}
+.sec-note{text-align:center;font-size:12.5px;color:#5c5136;font-weight:600;margin-bottom:24px}
+
+/* ─── 白カード ─── */
+.card{background:var(--white);border-radius:var(--radius);padding:28px;box-shadow:0 3px 14px rgba(80,60,0,.14)}
+
+/* ─── 募集要項 ─── */
+.job-title{font-size:18px;font-weight:800;display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.badge{font-size:11px;font-weight:800;padding:3px 12px;border-radius:20px;background:var(--cream);border:1.5px solid var(--yellow-deep)}
+.job-desc{font-size:14px;margin:10px 0 18px;line-height:2}
+.job-table{width:100%;border-collapse:collapse;margin-bottom:16px}
+.job-table th,.job-table td{border-bottom:1.5px dashed #e5dcc2;padding:10px 8px;font-size:13.5px;text-align:left;vertical-align:top;line-height:1.8}
+.job-table th{width:120px;font-weight:800;white-space:nowrap;color:#8a6d00}
+.skill-tags{display:flex;flex-wrap:wrap;gap:8px}
+.skill-tag{background:var(--cream);border:1.5px solid var(--yellow-deep);border-radius:20px;font-size:12px;font-weight:700;padding:4px 12px}
+
+/* ─── 応募フォーム ─── */
+.form-card{background:var(--white);border-radius:var(--radius);padding:32px;box-shadow:0 3px 14px rgba(80,60,0,.14);max-width:640px;margin:0 auto}
+.form-section-title{font-size:14px;font-weight:800;color:#8a6d00;margin:4px 0 16px;padding-bottom:8px;border-bottom:2px dashed var(--cream)}
+.form-group{margin-bottom:18px}
+.form-label{display:block;font-size:13px;font-weight:800;margin-bottom:5px}
+.req{color:var(--orange);margin-left:4px}
+.form-input,.form-select,.form-textarea{
+  width:100%;padding:11px 14px;border:1.5px solid #e0d5b5;border-radius:10px;
+  font-size:14px;color:var(--black);background:#fffef9;outline:none;font-family:inherit;
+  transition:border-color .15s,box-shadow .15s;
+}
+.form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--yellow-deep);box-shadow:0 0 0 3px rgba(217,163,3,.18)}
+.form-textarea{resize:vertical;min-height:120px}
+.form-select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M6 8L1 3h10z' fill='%238a8578'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.form-hint{font-size:11px;color:#8a8062;margin-top:3px}
+.check-row{display:flex;gap:20px}
+.check-item{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:700;cursor:pointer}
+.check-item input{width:16px;height:16px;accent-color:var(--yellow-deep)}
+.privacy-check{display:flex;align-items:flex-start;gap:10px;font-size:13px;line-height:1.7;margin-bottom:20px}
+.privacy-check input{width:16px;height:16px;margin-top:3px;accent-color:var(--yellow-deep);flex-shrink:0}
+.submit-btn{
+  width:100%;padding:15px;background:var(--black);color:var(--yellow);
+  font-size:16px;font-weight:800;border:none;border-radius:30px;cursor:pointer;
+  letter-spacing:.06em;transition:opacity .15s,transform .1s;font-family:inherit;
+}
+.submit-btn:hover{opacity:.85;transform:translateY(-1px)}
+.success-box{display:none;text-align:center;padding:26px 18px;background:var(--cream);border-radius:12px;margin-top:20px}
+.success-box .s-icon{font-size:36px;margin-bottom:8px}
+.success-box p{font-size:14px;font-weight:700;line-height:1.9}
+@media(max-width:520px){.form-row{grid-template-columns:1fr}.form-card{padding:22px 16px}}
+
+/* ─── 黒帯フッター ─── */
+footer{background:var(--dark);color:#f5efdd;padding:36px 24px;text-align:center}
+footer .f-name{font-size:15px;font-weight:800;color:var(--yellow);margin-bottom:8px;letter-spacing:.1em}
+footer .f-info{font-size:12px;line-height:2;color:#c9c0a8}
+footer a{color:#ffd75e;font-weight:800;text-decoration:none;font-size:13px}
+footer a:hover{text-decoration:underline}
+.footer-copy{font-size:11px;color:#9a917c;margin-top:18px}
+</style>
+</head>
+<body>
+
+<!-- トップへ戻る -->
+<div class="back-bar">
+  <a href="index.html" class="back-link">← トップページへ戻る</a>
+</div>
+
+<!-- ─── ヒーロー ─── -->
+<section class="hero">
+  <img src="images/tekuteku-logo.png" alt="児童発達支援・放課後等デイサービス てくてく" class="logo-img">
+  <h1>採用情報</h1>
+  <div class="hero-tags">
+    <span class="hero-tag">🐾 仙台市宮城野区</span>
+    <span class="hero-tag">🐾 卸町駅 徒歩8分</span>
+    <span class="hero-tag">🐾 有資格者歓迎</span>
+  </div>
+</section>
+
+<p class="job-desc" style="max-width:960px;margin:0 auto 28px;padding:0 24px;text-align:center">
+  ※個別療育　言語聴覚士による１対１の60分個別療育のみを展開<br>
+  ※対象　障害児通所受給者証を持つ0～18歳の方<br>
+  ※スタッフ　管理者含め全員が国家資格保有者
+</p>
+
+<main class="main">
+
+  <!-- ─── 募集要項 ─── -->
+  <section class="section">
+    <h2 class="sec-heading">募集要項</h2>
+
+    <div class="card">
+      <div class="job-title">🐾 児童発達支援管理責任者募集<span class="badge">正社員</span></div>
+
+      <table class="job-table">
+        <tr><th>雇用形態</th><td>正社員</td></tr>
+        <tr><th>勤務地</th><td>宮城県仙台市宮城野区宮千代3-1-9（卸町駅 徒歩8分）</td></tr>
+        <tr><th>勤務時間</th><td>10:00〜19:00</td></tr>
+        <tr><th>休日</th><td>完全週休2日制　木・日・祝</td></tr>
+        <tr><th>給与</th><td>月給210,000円～300,000円</td></tr>
+        <tr><th>仕事内容</th><td>個別支援計画書の作成／ご家族との面談／スタッフ育成／保育園、学校、相談支援事業所との連携会議等</td></tr>
+        <tr><th>応募資格</th><td>児童発達支援管理責任者研修修了者（必須）</td></tr>
+        <tr><th>待遇</th><td>賞与・昇給あり／交通費支給</td></tr>
+        <tr><th>休暇</th><td>年末年始休暇（12/29～1/3）／有給休暇（入社6か月経過後10日支給）</td></tr>
+      </table>
+    </div>
+  </section>
+
+  <!-- ─── 応募フォーム ─── -->
+  <section class="section" id="applyForm">
+    <h2 class="sec-heading">応募フォーム</h2>
+
+    <div class="form-card">
+      <form id="recruitForm" onsubmit="handleSubmit(event)">
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">お名前<span class="req">*</span></label>
+            <input type="text" class="form-input" placeholder="山田 花子" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">フリガナ<span class="req">*</span></label>
+            <input type="text" class="form-input" placeholder="ヤマダ ハナコ" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">メールアドレス<span class="req">*</span></label>
+          <input type="email" class="form-input" placeholder="example@mail.com" required>
+          <p class="form-hint">選考のご連絡はこちらのアドレスに送ります。</p>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">電話番号<span class="req">*</span></label>
+          <input type="tel" class="form-input" placeholder="090-0000-0000" required>
+        </div>
+
+        <div class="form-group" style="margin-top:24px">
+          <label class="form-label">ご希望の内容<span class="req">*</span></label>
+          <div class="check-row">
+            <label class="check-item"><input type="checkbox" name="visitType" value="見学">見学</label>
+            <label class="check-item"><input type="checkbox" name="visitType" value="面接">面接</label>
+          </div>
+          <p class="form-hint">見学だけのご希望も歓迎です。</p>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">入社希望時期</label>
+          <select class="form-select">
+            <option value="">選択してください</option>
+            <option>いつでも</option>
+            <option>半年以内</option>
+            <option>一年以内</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">児童発達支援管理責任者研修</label>
+          <select class="form-select">
+            <option value="">選択してください</option>
+            <option>修了済み</option>
+            <option>修了見込み</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">児発管としての経験年数</label>
+          <input type="text" class="form-input" placeholder="例：1年9か月">
+          <p class="form-hint">未経験の場合は「0年」とご記入ください。</p>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">ご質問など</label>
+          <textarea class="form-textarea" rows="3" placeholder="気になることがあればお気軽にどうぞ。"></textarea>
+        </div>
+
+        <div class="privacy-check">
+          <input type="checkbox" id="privacyCheck" required>
+          <label for="privacyCheck">個人情報の取り扱いに同意して応募します。<span class="req">*</span></label>
+        </div>
+
+        <button type="submit" class="submit-btn">🐾 応募する</button>
+
+        <div class="success-box" id="successBox">
+          <div class="s-icon">🐾</div>
+          <p>ご応募ありがとうございます！<br>3営業日以内にご連絡いたします。<br>てくてくスタッフ一同、お会いできることを楽しみにしています。</p>
+        </div>
+
+      </form>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="f-name">児童発達支援・放課後等デイサービス てくてく</div>
+  <div class="f-info">
+    宮城県仙台市宮城野区宮千代3-1-9（仙台市営地下鉄東西線 卸町駅から徒歩8分）<br>
+    営業時間 10:00〜19:00（木・日・祝 休み）
+  </div>
+  <p style="margin-top:14px"><a href="index.html">← トップページへ戻る</a></p>
+  <div class="footer-copy">&copy; 2025 てくてく. All rights reserved.</div>
+</footer>
+
+<script>
+// 応募ボタンを押したときの処理
+// e.preventDefault() = 「ページを再読み込みして送信する」ブラウザの標準動作を止める
+// ※現状は見た目だけのデモ。実際にメールを飛ばすには送信サービス(Formspreeなど)との連携が必要
+function handleSubmit(e) {
+  e.preventDefault();
+  // 見学・面接のどちらかは必ず選んでもらう
+  const visitChecked = e.target.querySelectorAll('input[name="visitType"]:checked').length > 0;
+  if (!visitChecked) {
+    alert('「見学」「面接」のどちらか（両方でも可）を選んでください。');
+    return;
+  }
+  e.target.style.opacity = '.5';           // フォームを半透明にして「送信済み」感を出す
+  e.target.style.pointerEvents = 'none';   // 二重送信できないように操作を無効化
+  document.getElementById('successBox').style.display = 'block'; // 完了メッセージを表示
+}
+</script>
+
+</body>
+</html>
