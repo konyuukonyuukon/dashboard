@@ -154,6 +154,22 @@ footer a:hover{text-decoration:underline}
         <tr><th>休暇</th><td>年末年始休暇（12/29～1/3）／有給休暇（入社6か月経過後10日支給）</td></tr>
       </table>
     </div>
+
+    <div class="card" style="margin-top:20px">
+      <div class="job-title">🐾 児童発達支援管理責任者募集<span class="badge">正社員</span></div>
+
+      <table class="job-table">
+        <tr><th>雇用形態</th><td>正社員</td></tr>
+        <tr><th>勤務地</th><td>宮城県仙台市宮城野区宮千代3-1-9（卸町駅 徒歩8分）</td></tr>
+        <tr><th>勤務時間</th><td>10:00〜19:00</td></tr>
+        <tr><th>休日</th><td>完全週休2日制　木・日・祝</td></tr>
+        <tr><th>給与</th><td>月給210,000円～300,000円</td></tr>
+        <tr><th>仕事内容</th><td>個別支援計画書の作成／ご家族との面談／スタッフ育成／保育園、学校、相談支援事業所との連携会議等</td></tr>
+        <tr><th>応募資格</th><td>児童発達支援管理責任者研修修了者（必須）</td></tr>
+        <tr><th>待遇</th><td>賞与・昇給あり／交通費支給</td></tr>
+        <tr><th>休暇</th><td>年末年始休暇（12/29～1/3）／有給休暇（入社6か月経過後10日支給）</td></tr>
+      </table>
+    </div>
   </section>
 
   <!-- ─── 応募フォーム ─── -->
@@ -162,6 +178,15 @@ footer a:hover{text-decoration:underline}
 
     <div class="form-card">
       <form id="recruitForm" onsubmit="handleSubmit(event)">
+
+        <div class="form-group">
+          <label class="form-label">ご希望の職種<span class="req">*</span></label>
+          <select class="form-select" required>
+            <option value="">選択してください</option>
+            <option>言語聴覚士</option>
+            <option>児童発達支援管理責任者</option>
+          </select>
+        </div>
 
         <div class="form-row">
           <div class="form-group">
@@ -205,16 +230,18 @@ footer a:hover{text-decoration:underline}
         </div>
 
         <div class="form-group">
-          <label class="form-label">言語聴覚士資格</label>
+          <label class="form-label">資格・研修の状況</label>
           <select class="form-select">
             <option value="">選択してください</option>
-            <option>資格あり（取得済み）</option>
-            <option>取得見込み</option>
+            <option>言語聴覚士：資格あり（取得済み）</option>
+            <option>言語聴覚士：取得見込み</option>
+            <option>児童発達支援管理責任者研修：修了済み</option>
+            <option>児童発達支援管理責任者研修：修了見込み</option>
           </select>
         </div>
 
         <div class="form-group">
-          <label class="form-label">小児ST経験年数</label>
+          <label class="form-label">実務経験年数</label>
           <input type="text" class="form-input" placeholder="例：1年9か月">
           <p class="form-hint">未経験の場合は「0年」とご記入ください。</p>
         </div>
