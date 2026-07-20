@@ -64,6 +64,24 @@ body{font-family:'Yu Gothic UI',-apple-system,BlinkMacSystemFont,'Segoe UI',sans
 .tpl-btn{padding:3px 10px;border:1px solid var(--border);border-radius:4px;font-size:11px;cursor:pointer;background:var(--bg2);color:var(--text2);transition:all .1s}
 .tpl-btn:hover{background:var(--accent-bg);color:var(--accent-light);border-color:var(--accent)}
 
+.images-bar{display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--bg4);border-bottom:1px solid var(--border);flex-wrap:wrap;transition:outline .1s}
+.images-bar .img-label{font-size:11px;color:var(--text3);white-space:nowrap}
+.img-add-btn{padding:5px 12px;border:1px solid var(--border);border-radius:5px;font-size:11px;cursor:pointer;background:var(--bg2);color:var(--text2);white-space:nowrap}
+.img-add-btn:hover{background:var(--accent-bg);color:var(--accent-light);border-color:var(--accent)}
+.img-hint{font-size:10px;color:var(--text3);white-space:nowrap}
+.img-thumbs{display:flex;gap:6px;flex-wrap:wrap}
+.img-thumb-wrap{position:relative;width:52px;height:52px;border-radius:5px;overflow:hidden;border:1px solid var(--border);cursor:pointer;flex-shrink:0}
+.img-thumb-wrap img{width:100%;height:100%;object-fit:cover;display:block}
+.img-thumb-del{position:absolute;top:0;right:0;width:16px;height:16px;background:rgba(0,0,0,.7);color:#fff;font-size:11px;line-height:16px;text-align:center;cursor:pointer;border-radius:0 0 0 4px}
+.img-thumb-del:hover{background:var(--red)}
+.images-bar.dropzone-active{outline:2px dashed var(--accent);outline-offset:-2px}
+
+.lightbox-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.85);display:flex;align-items:center;justify-content:center;z-index:200;flex-direction:column;gap:12px}
+.lightbox-overlay img{max-width:90vw;max-height:80vh;border-radius:6px}
+.lightbox-btns{display:flex;gap:10px}
+.lightbox-btn{padding:8px 16px;border:none;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;color:var(--text);background:var(--bg4)}
+.lightbox-btn.del{background:var(--red)}
+
 .tab-editor-wrap{flex:1;overflow:auto;position:relative}
 .tab-editor{width:100%;height:100%;padding:16px 18px;background:var(--tab-bg);color:#c0caf5;font-family:'Consolas','Courier New',monospace;font-size:14px;line-height:1.6;border:none;outline:none;resize:none;tab-size:4}
 
@@ -172,6 +190,14 @@ body{font-family:'Yu Gothic UI',-apple-system,BlinkMacSystemFont,'Segoe UI',sans
         <button class="tpl-btn" onclick="insertTemplate('divider')">区切り</button>
       </div>
 
+      <div class="images-bar" id="images-bar">
+        <span class="img-label">&#x1f4f7; 参考スクショ:</span>
+        <button class="img-add-btn" onclick="document.getElementById('img-file-input').click()">+ 画像を追加</button>
+        <input type="file" id="img-file-input" accept="image/*" multiple style="display:none" onchange="handleImageFiles(this.files); this.value='';">
+        <span class="img-hint">貼り付け(Ctrl+V)・ドラッグ&ドロップも可</span>
+        <div class="img-thumbs" id="img-thumbs"></div>
+      </div>
+
       <div class="tab-editor-wrap">
         <textarea class="tab-editor" id="tab-editor" spellcheck="false" placeholder="ここにTAB譜を入力..."></textarea>
       </div>
@@ -193,6 +219,14 @@ body{font-family:'Yu Gothic UI',-apple-system,BlinkMacSystemFont,'Segoe UI',sans
   <div class="modal" id="modal-content"></div>
 </div>
 
+<div class="lightbox-overlay" id="lightbox" style="display:none">
+  <img id="lightbox-img" src="" alt="スクショ拡大表示">
+  <div class="lightbox-btns">
+    <button class="lightbox-btn del" onclick="deleteCurrentLightboxImage()">&#x1f5d1; 削除</button>
+    <button class="lightbox-btn" onclick="closeLightbox()">閉じる</button>
+  </div>
+</div>
+
 <script>
 const EMPTY_TAB = `e|----------------------------|\nB|----------------------------|\nG|----------------------------|\nD|----------------------------|\nA|----------------------------|\nE|----------------------------|`;
 const STORAGE_KEY = 'guitar_tab_manager_songs';
@@ -210,7 +244,11 @@ function loadSongs() {
 }
 
 function persistSongs() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(songs));
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(songs));
+  } catch (e) {
+    alert('保存に失敗しました。画像の容量が大きすぎる可能性があります。不要な画像を削除してから再度お試しください。');
+  }
 }
 
 function newSongData(title, artist) {
@@ -224,6 +262,7 @@ function newSongData(title, artist) {
     capo: '0',
     sections: [{ name: 'イントロ', tab: EMPTY_TAB }],
     notes: '',
+    images: [],
     created: now,
     modified: now
   };
@@ -272,8 +311,10 @@ function loadSongToEditor() {
   document.getElementById('inp-bpm').value = s.bpm;
   document.getElementById('inp-capo').value = s.capo;
   document.getElementById('inp-notes').value = s.notes || '';
+  if (!s.images) s.images = [];
 
   renderSections();
+  renderImages();
   dirty = false;
   updateStatus();
 }
@@ -472,6 +513,96 @@ function exportText() {
   setStatus('テキスト出力しました');
 }
 
+let lightboxIdx = null;
+
+function renderImages() {
+  const wrap = document.getElementById('img-thumbs');
+  wrap.innerHTML = '';
+  if (currentIdx === null) return;
+  const s = songs[currentIdx];
+  (s.images || []).forEach((img, i) => {
+    const div = document.createElement('div');
+    div.className = 'img-thumb-wrap';
+    div.innerHTML = `<img src="${img.dataUrl}" alt="スクショ ${i + 1}"><span class="img-thumb-del" title="削除">&times;</span>`;
+    div.querySelector('img').onclick = () => openLightbox(i);
+    div.querySelector('.img-thumb-del').onclick = (e) => { e.stopPropagation(); deleteImage(i); };
+    wrap.appendChild(div);
+  });
+}
+
+function resizeImage(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const img = new Image();
+      img.onload = () => {
+        const maxDim = 1200;
+        let { width, height } = img;
+        if (width > maxDim || height > maxDim) {
+          const scale = maxDim / Math.max(width, height);
+          width = Math.round(width * scale);
+          height = Math.round(height * scale);
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+        resolve(canvas.toDataURL('image/jpeg', 0.82));
+      };
+      img.onerror = reject;
+      img.src = reader.result;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+async function handleImageFiles(fileList) {
+  if (currentIdx === null) { alert('先に曲を選択してください。'); return; }
+  const files = Array.from(fileList).filter(f => f.type.startsWith('image/'));
+  if (files.length === 0) return;
+  const s = songs[currentIdx];
+  if (!s.images) s.images = [];
+  for (const file of files) {
+    try {
+      const dataUrl = await resizeImage(file);
+      s.images.push({ id: Date.now().toString(36) + Math.random().toString(36).slice(2), dataUrl });
+    } catch (e) { /* 読み込み失敗はスキップ */ }
+  }
+  renderImages();
+  markDirty();
+  saveCurrent(true);
+  setStatus('画像を追加しました');
+}
+
+function deleteImage(i) {
+  if (currentIdx === null) return;
+  const s = songs[currentIdx];
+  if (!confirm('この画像を削除しますか？')) return;
+  s.images.splice(i, 1);
+  renderImages();
+  markDirty();
+  saveCurrent(true);
+  if (lightboxIdx !== null) closeLightbox();
+}
+
+function openLightbox(i) {
+  lightboxIdx = i;
+  const s = songs[currentIdx];
+  document.getElementById('lightbox-img').src = s.images[i].dataUrl;
+  document.getElementById('lightbox').style.display = 'flex';
+}
+
+function closeLightbox() {
+  document.getElementById('lightbox').style.display = 'none';
+  lightboxIdx = null;
+}
+
+function deleteCurrentLightboxImage() {
+  if (lightboxIdx === null) return;
+  deleteImage(lightboxIdx);
+}
+
 function markDirty() { dirty = true; updateStatus(); }
 
 function updateStatus() {
@@ -520,6 +651,31 @@ document.getElementById('modal').addEventListener('click', e => {
   if (e.target.id === 'modal') closeModal();
 });
 
+document.getElementById('lightbox').addEventListener('click', e => {
+  if (e.target.id === 'lightbox') closeLightbox();
+});
+
+document.addEventListener('paste', e => {
+  if (currentIdx === null) return;
+  const items = Array.from(e.clipboardData ? e.clipboardData.items : []);
+  const imageItems = items.filter(it => it.type.startsWith('image/'));
+  if (imageItems.length === 0) return;
+  e.preventDefault();
+  handleImageFiles(imageItems.map(it => it.getAsFile()));
+});
+
+const dropTargets = [document.getElementById('images-bar'), document.querySelector('.tab-editor-wrap')];
+dropTargets.forEach(el => {
+  if (!el) return;
+  el.addEventListener('dragover', e => { e.preventDefault(); document.getElementById('images-bar').classList.add('dropzone-active'); });
+  el.addEventListener('dragleave', () => { document.getElementById('images-bar').classList.remove('dropzone-active'); });
+  el.addEventListener('drop', e => {
+    e.preventDefault();
+    document.getElementById('images-bar').classList.remove('dropzone-active');
+    if (e.dataTransfer && e.dataTransfer.files) handleImageFiles(e.dataTransfer.files);
+  });
+});
+
 document.getElementById('tab-editor').addEventListener('input', markDirty);
 document.getElementById('inp-notes').addEventListener('input', markDirty);
 ['inp-title','inp-artist','inp-tuning','inp-bpm','inp-capo'].forEach(id => {
@@ -530,7 +686,7 @@ document.getElementById('inp-notes').addEventListener('input', markDirty);
 document.addEventListener('keydown', e => {
   if (e.ctrlKey && e.key === 's') { e.preventDefault(); saveCurrent(); }
   if (e.ctrlKey && e.key === 'n') { e.preventDefault(); newSong(); }
-  if (e.key === 'Escape') closeModal();
+  if (e.key === 'Escape') { closeModal(); closeLightbox(); }
 });
 
 document.getElementById('tab-editor').addEventListener('keydown', e => {
