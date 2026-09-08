@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Guitar Fret Quiz — 指板さがしクイズ</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0f0f0f;--bg2:#1a1a1a;--bg3:#242424;--bg4:#2e2e2e;
+  --border:#333;--border2:#444;
+  --text:#f0f0f0;--text2:#aaa;--text3:#666;
+  --purple:#8b7cf8;--purple-bg:#1e1a3a;--purple-light:#a99ff9;
+  --green:#4ade80;--green-bg:#0d2818;--green-border:#1e5c33;
+  --red:#f87171;--red-bg:#2a0d0d;--red-border:#5c1e1e;
+  --teal:#2dd4bf;--teal-bg:#0d2420;
+  --amber:#fbbf24;--amber-bg:#332a08;--amber-border:#5c4a10;
+}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Helvetica Neue',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+
+.app{max-width:820px;margin:0 auto;padding:16px}
+.header{display:flex;align-items:center;gap:14px;padding:20px 0 16px;border-bottom:0.5px solid var(--border);margin-bottom:0;flex-wrap:wrap}
+.logo{width:40px;height:40px;border-radius:10px;background:var(--purple-bg);border:0.5px solid var(--purple);display:flex;align-items:center;justify-content:center;font-size:20px}
+.header-title{font-size:18px;font-weight:600;color:var(--text)}
+.header-sub{font-size:12px;color:var(--text3);margin-top:2px}
+.header-links{display:flex;gap:8px;flex-wrap:wrap}
+.hlink{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border:0.5px solid var(--border2);border-radius:8px;font-size:12px;color:var(--text2);text-decoration:none;background:var(--bg2);white-space:nowrap}
+.hlink:hover{border-color:var(--purple);color:var(--purple-light)}
+
+.nav{display:flex;gap:0;background:var(--bg2);border:0.5px solid var(--border);border-radius:10px;padding:4px;margin:16px 0;overflow-x:auto}
+.nav-btn{padding:8px 14px;font-size:13px;font-weight:400;color:var(--text2);border:none;background:none;cursor:pointer;border-radius:7px;transition:all .15s;white-space:nowrap;flex-shrink:0}
+.nav-btn.active{background:var(--bg4);color:var(--text);font-weight:500}
+.nav-btn:hover:not(.active){color:var(--text);background:var(--bg3)}
+
+.sec{display:none}.sec.active{display:block}
+
+.mode-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.mode-chip{padding:6px 14px;border:0.5px solid var(--border2);border-radius:20px;font-size:12px;cursor:pointer;background:var(--bg2);color:var(--text2);transition:all .15s}
+.mode-chip.active{background:var(--purple-bg);border-color:var(--purple);color:var(--purple-light);font-weight:500}
+.mode-chip:hover:not(.active){background:var(--bg3);color:var(--text)}
+
+.qbox{background:var(--bg2);border:0.5px solid var(--border);border-radius:12px;padding:18px 20px;margin-bottom:14px}
+.qlabel{font-size:11px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px}
+.qtext{font-size:19px;font-weight:600;color:var(--text);line-height:1.4}
+.qtext .hl{color:var(--purple-light)}
+.qhint{font-size:12px;color:var(--text3);margin-top:8px}
+
+.ctrl-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
+.ctrl-row label{font-size:12px;color:var(--text2)}
+.fb-select{font-size:13px;padding:7px 10px;border:0.5px solid var(--border2);border-radius:8px;background:var(--bg2);color:var(--text);cursor:pointer;outline:none}
+.fb-select:focus{border-color:var(--purple)}
+
+.btn{padding:9px 16px;border:0.5px solid var(--border2);border-radius:8px;font-size:13px;cursor:pointer;background:var(--bg3);color:var(--text);font-weight:500;transition:all .15s}
+.btn:hover{background:var(--bg4)}
+.btn.primary{border-color:var(--purple);background:var(--purple-bg);color:var(--purple-light)}
+.btn.primary:hover{background:var(--purple);color:#fff}
+.btn:disabled{opacity:.4;cursor:default}
+
+.score-row{display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap}
+.score-pill{background:var(--bg2);border:0.5px solid var(--border);border-radius:20px;padding:5px 14px;font-size:12px;color:var(--text2)}
+.score-pill strong{color:var(--text);font-weight:500}
+.progress-line{font-size:12px;color:var(--purple-light);margin-bottom:12px;min-height:16px}
+
+.note-picker{background:var(--bg3);border:0.5px solid var(--purple);border-radius:10px;padding:12px 14px;margin-bottom:12px;display:none}
+.np-label{font-size:13px;color:var(--text);margin-bottom:8px;font-weight:500}
+.np-btns{display:flex;gap:6px;flex-wrap:wrap}
+.npbtn{padding:7px 12px;border:0.5px solid var(--border2);border-radius:7px;font-size:13px;font-weight:600;cursor:pointer;background:var(--bg4);color:var(--text)}
+.npbtn:hover{background:var(--purple-bg);border-color:var(--purple);color:var(--purple-light)}
+.npbtn.sharp{font-size:11px}
+.npbtn.cancel{font-weight:400;color:var(--text2)}
+
+.fb-wrap{background:var(--bg2);border:0.5px solid var(--border);border-radius:12px;padding:16px;overflow-x:auto;margin-bottom:12px}
+.fb-table{border-collapse:collapse;font-size:11px}
+.fb-table th{padding:4px 5px;color:#555;font-weight:400;text-align:center;min-width:38px;font-size:10px}
+.fb-table td{padding:3px}
+.fb-cell{width:36px;height:36px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;cursor:pointer;user-select:none;transition:all .1s;border:0.5px solid var(--border)}
+.fb-cell.sel{background:var(--purple-bg);border-color:var(--purple);color:var(--purple-light)}
+.fb-cell.correct{background:var(--green-bg);border-color:var(--green-border);color:var(--green)}
+.fb-cell.wrong{background:var(--red-bg);border-color:var(--red-border);color:var(--red)}
+.fb-cell.missed{background:var(--amber-bg);border-color:var(--amber-border);color:var(--amber)}
+.fb-cell.locked{cursor:default}
+.str-label{font-size:10px;color:#666;white-space:nowrap;text-align:right;padding-right:8px}
+
+.result-banner{padding:13px 16px;border-radius:8px;font-size:13px;line-height:1.6;margin-bottom:12px}
+.result-banner.perfect{background:var(--green-bg);color:#86efac;border:0.5px solid var(--green-border)}
+.result-banner.ok{background:var(--amber-bg);color:#fde68a;border:0.5px solid var(--amber-border)}
+.result-banner.ng{background:var(--red-bg);color:#fca5a5;border:0.5px solid var(--red-border)}
+.result-banner .rlabel{font-weight:600;margin-bottom:4px;display:block}
+
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:11px;color:var(--text3);margin-bottom:8px}
+.legend span{display:inline-flex;align-items:center;gap:5px}
+.legend i{width:10px;height:10px;border-radius:3px;display:inline-block}
+
+.exp-card{background:var(--bg2);border:0.5px solid var(--border);border-radius:12px;padding:20px 22px;margin-bottom:14px}
+.exp-h2{font-size:15px;font-weight:600;color:var(--text);margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.exp-p{font-size:13px;color:var(--text2);line-height:1.8;margin-bottom:10px}
+.exp-p:last-child{margin-bottom:0}
+.exp-list{font-size:13px;color:var(--text2);line-height:1.8;padding-left:1.3em;margin-bottom:10px}
+.exp-list li{margin-bottom:5px}
+.exp-note{background:var(--purple-bg);border-left:3px solid var(--purple);padding:10px 14px;border-radius:0 8px 8px 0;font-size:13px;color:var(--purple-light);line-height:1.7;margin-top:8px}
+.exp-table{width:100%;border-collapse:collapse;font-size:13px;margin-top:8px}
+.exp-table th{text-align:left;padding:8px 10px;border-bottom:0.5px solid var(--border);color:var(--text3);font-weight:500;font-size:11px;background:var(--bg3);text-transform:uppercase;letter-spacing:.05em}
+.exp-table td{padding:8px 10px;border-bottom:0.5px solid var(--border);color:var(--text)}
+.exp-table tr:last-child td{border-bottom:none}
+.roman{display:inline-block;padding:2px 9px;border-radius:20px;font-size:12px;font-weight:600;background:var(--purple-bg);color:var(--purple-light)}
+.role-tag{font-size:11px;color:var(--text3)}
+
+@media(max-width:600px){.fb-cell{width:28px;height:28px;font-size:10px}.header-title{font-size:15px}}
+</style>
+</head>
+<body>
+<div class="app">
+<div class="header">
+  <div class="logo">🎯</div>
+  <div style="flex:1">
+    <div class="header-title">指板さがしクイズ</div>
+    <div class="header-sub">マスをクリックして音名を答えよう</div>
+  </div>
+  <div class="header-links">
+    <a href="index.html" class="hlink">🎸 Theory Trainer</a>
+    <a href="guitar_scale_textbook.html" class="hlink">📖 教科書</a>
+  </div>
+</div>
+
+<div class="nav">
+  <button class="nav-btn active" onclick="switchTab('note',this)">音さがし</button>
+  <button class="nav-btn" onclick="switchTab('scale',this)">スケールさがし</button>
+  <button class="nav-btn" onclick="switchTab('theory',this)">キーと度数の解説</button>
+</div>
+
+<!-- 音さがし -->
+<div id="sec-note" class="sec active">
+  <div class="mode-row">
+    <button class="mode-chip active" id="notemode-search" onclick="setNoteMode('search',this)">この音はどこ？（1音を探す）</button>
+    <button class="mode-chip" id="notemode-fill" onclick="setNoteMode('fill',this)">指板を全部埋める</button>
+  </div>
+
+  <div id="note-search-panel">
+    <div class="qbox">
+      <div class="qlabel">音さがしクイズ</div>
+      <div class="qtext">指板の上にある <span class="hl" id="note-target">C</span> を<u>すべて</u>クリックしてください</div>
+      <div class="qhint">これだと思うマスをクリックして選択(青)。選び終わったら「答え合わせ」を押してください。</div>
+    </div>
+    <div class="score-row">
+      <div class="score-pill">パーフェクト <strong id="note-perfect">0</strong></div>
+      <div class="score-pill">挑戦回数 <strong id="note-attempt">0</strong></div>
+    </div>
+    <div class="progress-line" id="note-progress"></div>
+    <div id="note-result"></div>
+    <div class="legend">
+      <span><i style="background:var(--purple-bg);border:1px solid var(--purple)"></i>選択中</span>
+      <span><i style="background:var(--green-bg);border:1px solid var(--green-border)"></i>正解</span>
+      <span><i style="background:var(--red-bg);border:1px solid var(--red-border)"></i>不正解</span>
+      <span><i style="background:var(--amber-bg);border:1px solid var(--amber-border)"></i>見逃し</span>
+    </div>
+    <div class="fb-wrap" id="note-fb"></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn primary" onclick="finalizeJudge('note')">答え合わせ</button>
+      <button class="btn" onclick="resetAttempts('note')">やり直す</button>
+      <button class="btn" onclick="nextNoteQ()">次の問題 →</button>
+    </div>
+  </div>
+
+  <div id="note-fill-panel" style="display:none">
+    <div class="qbox">
+      <div class="qlabel">指板ぜんぶ埋めクイズ</div>
+      <div class="qtext">1〜12フレット × 1〜6弦、<u>すべてのマス</u>の音名を埋めてください</div>
+      <div class="qhint">マスをクリックすると音名ボタンが出ます。全部埋まったら「答え合わせ」を押しましょう。</div>
+    </div>
+    <div class="score-row">
+      <div class="score-pill">パーフェクト <strong id="fill-perfect">0</strong></div>
+      <div class="score-pill">挑戦回数 <strong id="fill-attempt">0</strong></div>
+    </div>
+    <div class="progress-line" id="fill-progress"></div>
+    <div id="fill-result"></div>
+    <div class="legend">
+      <span><i style="background:var(--purple-bg);border:1px solid var(--purple)"></i>回答待ち</span>
+      <span><i style="background:var(--green-bg);border:1px solid var(--green-border)"></i>正解</span>
+      <span><i style="background:var(--red-bg);border:1px solid var(--red-border)"></i>不正解</span>
+      <span><i style="background:var(--amber-bg);border:1px solid var(--amber-border)"></i>見逃し</span>
+    </div>
+    <div class="note-picker" id="fill-picker">
+      <div class="np-label" id="fill-picker-label"></div>
+      <div class="np-btns" id="fill-picker-btns"></div>
+    </div>
+    <div class="fb-wrap" id="fill-fb"></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn primary" onclick="finalizeJudge('fill')">答え合わせ</button>
+      <button class="btn" onclick="resetAttempts('fill')">やり直す</button>
+    </div>
+  </div>
+</div>
+
+<!-- スケールさがし -->
+<div id="sec-scale" class="sec">
+  <div class="ctrl-row">
+    <label>キー:</label>
+    <select class="fb-select" id="scale-key-sel">
+      <option value="C">C</option><option value="C#">C#/D♭</option><option value="D">D</option>
+      <option value="D#">D#/E♭</option><option value="E">E</option><option value="F">F</option>
+      <option value="F#">F#/G♭</option><option value="G">G</option><option value="G#">G#/A♭</option>
+      <option value="A" selected>A</option><option value="A#">A#/B♭</option><option value="B">B</option>
+    </select>
+    <label>スケール:</label>
+    <select class="fb-select" id="scale-type-sel">
+      <option value="major">メジャースケール</option>
+      <option value="minor">ナチュラルマイナー</option>
+      <option value="penta_maj">メジャーペンタトニック</option>
+      <option value="penta_min" selected>マイナーペンタトニック</option>
+      <option value="blues">ブルーススケール</option>
+      <option value="dorian">ドリアン</option>
+      <option value="mixolydian">ミクソリディアン</option>
+    </select>
+    <button class="btn primary" onclick="startScaleQ()">この問題を出す</button>
+  </div>
+  <div class="qbox">
+    <div class="qlabel">スケールさがしクイズ</div>
+    <div class="qtext" id="scale-qtext">キーとスケールを選んで「この問題を出す」を押してください</div>
+    <div class="qhint" id="scale-qhint">これだと思うマスをクリックして選択(青)。選び終わったら「答え合わせ」を押してください。</div>
+  </div>
+  <div class="score-row">
+    <div class="score-pill">パーフェクト <strong id="scale-perfect">0</strong></div>
+    <div class="score-pill">挑戦回数 <strong id="scale-attempt">0</strong></div>
+  </div>
+  <div class="progress-line" id="scale-progress"></div>
+  <div id="scale-result"></div>
+  <div class="legend">
+    <span><i style="background:var(--purple-bg);border:1px solid var(--purple)"></i>選択中</span>
+    <span><i style="background:var(--green-bg);border:1px solid var(--green-border)"></i>正解</span>
+    <span><i style="background:var(--red-bg);border:1px solid var(--red-border)"></i>不正解</span>
+    <span><i style="background:var(--amber-bg);border:1px solid var(--amber-border)"></i>見逃し</span>
+  </div>
+  <div class="fb-wrap" id="scale-fb"></div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap">
+    <button class="btn primary" onclick="finalizeJudge('scale')">答え合わせ</button>
+    <button class="btn" onclick="resetAttempts('scale')">やり直す</button>
+  </div>
+</div>
+
+<!-- キーと度数の解説 -->
+<div id="sec-theory" class="sec">
+
+  <div class="exp-card">
+    <div class="exp-h2">🔑 曲の「キー」って何で決まるの?</div>
+    <p class="exp-p"><strong>キー(調)</strong>とは、その曲の「基準になる音(トニック)」と、そこから作られるスケールのことです。キーが分かると、その曲でどの音・どのコードが使われやすいかが見えてきます。</p>
+    <p class="exp-p">キーを見分けるには、次のポイントをチェックします:</p>
+    <ul class="exp-list">
+      <li><strong>曲の最後に落ち着く音・コード</strong> — 曲が「終わった!」と感じる音は、多くの場合そのキーのトニック(1度)です</li>
+      <li><strong>使われている音の集まり</strong> — 出てくる音を集めて、どのメジャー/マイナースケールに当てはまるかを調べる</li>
+      <li><strong>「帰ってきた」感のある進行</strong> — ドミナント(V)からトニック(I)に戻る進行(V→I)は、キーを強く感じさせる場所</li>
+      <li><strong>楽譜の調号</strong> — ♯や♭の数を見れば、五線譜ではキーがすぐ分かる</li>
+    </ul>
+    <div class="exp-note">💡 例: <strong>C → Am → F → G → C</strong> という進行が繰り返される曲は、Cで始まり、Gから戻ってCで落ち着く。この場合は「Cメジャーキー」の可能性が高いです。</div>
+  </div>
+
+  <div class="exp-card">
+    <div class="exp-h2">📏 度数(なんど)ってなに?</div>
+    <p class="exp-p"><strong>度数</strong>は、基準の音(1度）から数えて「何番目の音か」を表す数え方です。キーが決まれば、そのキーのスケールの中で各音に番号(度数)がつきます。</p>
+    <p class="exp-p">例えば <strong>Cメジャーキー</strong> なら:</p>
+    <table class="exp-table">
+      <thead><tr><th>音</th><th>C</th><th>D</th><th>E</th><th>F</th><th>G</th><th>A</th><th>B</th></tr></thead>
+      <tbody><tr><td>度数</td><td>1度</td><td>2度</td><td>3度</td><td>4度</td><td>5度</td><td>6度</td><td>7度</td></tr></tbody>
+    </table>
+    <p class="exp-p" style="margin-top:12px">コードの構成音も度数で表せます:</p>
+    <ul class="exp-list">
+      <li><strong>メジャーコード</strong> = 1度 + 3度 + 5度（例: C = C・E・G）</li>
+      <li><strong>マイナーコード</strong> = 1度 + ♭3度 + 5度（例: Cm = C・E♭・G）</li>
+      <li><strong>セブンスコード</strong> = 1度 + 3度 + 5度 + ♭7度（例: C7 = C・E・G・B♭）</li>
+    </ul>
+  </div>
+
+  <div class="exp-card">
+    <div class="exp-h2">🎼 キーの中の度数でコードの役割が決まる</div>
+    <p class="exp-p">キーのスケール上の音をそれぞれルートにしてコードを作ると、7つのコードができます。これを<strong>ダイアトニックコード</strong>と呼び、ローマ数字（<span class="roman">I</span> <span class="roman">II</span> <span class="roman">III</span>…）で表します。</p>
+    <p class="exp-p">中でも特に大事なのが <strong>I・IV・V</strong> の3つの役割です:</p>
+    <ul class="exp-list">
+      <li><span class="roman">I</span> <strong>トニック</strong> — 曲の「家」。一番安定していて、落ち着く響き</li>
+      <li><span class="roman">IV</span> <strong>サブドミナント</strong> — 「外出」。少し動き出す、やわらかい響き</li>
+      <li><span class="roman">V</span> <strong>ドミナント</strong> — 「帰りたくなる」。不安定で、次に I に戻りたくなる緊張感</li>
+    </ul>
+    <p class="exp-p" style="margin-top:12px">Cメジャーキーの場合のダイアトニックコード:</p>
+    <table class="exp-table">
+      <thead><tr><th>度数</th><th>ローマ数字</th><th>コード</th><th>役割</th></tr></thead>
+      <tbody>
+        <tr><td>1度</td><td><span class="roman">I</span></td><td>C</td><td class="role-tag">トニック（安定）</td></tr>
+        <tr><td>2度</td><td><span class="roman">ii</span></td><td>Dm</td><td class="role-tag">サブドミナント寄り</td></tr>
+        <tr><td>3度</td><td><span class="roman">iii</span></td><td>Em</td><td class="role-tag">トニック寄り</td></tr>
+        <tr><td>4度</td><td><span class="roman">IV</span></td><td>F</td><td class="role-tag">サブドミナント（やわらか）</td></tr>
+        <tr><td>5度</td><td><span class="roman">V</span></td><td>G</td><td class="role-tag">ドミナント（緊張）</td></tr>
+        <tr><td>6度</td><td><span class="roman">vi</span></td><td>Am</td><td class="role-tag">トニック寄り</td></tr>
+        <tr><td>7度</td><td><span class="roman">vii°</span></td><td>Bdim</td><td class="role-tag">ドミナント寄り（不安定）</td></tr>
+      </tbody>
+    </table>
+    <div class="exp-note">💡 有名な「王道進行」や「カノン進行」も、このローマ数字（I-V-vi-IV など）の組み合わせで説明できます。キーが変わっても、ローマ数字の関係性は同じまま平行移動するのがポイントです。</div>
+  </div>
+
+</div>
+
+</div>
+
+<script>
+const NOTES=['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+const STRINGS=[4,9,2,7,11,4]; // インデックス0=6弦(低E)〜5=1弦(高E) の開放弦の半音番号
+const STR_NAMES=['1弦','2弦','3弦','4弦','5弦','6弦']; // 開放弦の音名は非表示(ヒントになるため)
+const FRETS=12; // 1〜12フレット(開放弦は含めない)
+const SCALES={
+  major:[0,2,4,5,7,9,11],minor:[0,2,3,5,7,8,10],
+  penta_maj:[0,2,4,7,9],penta_min:[0,3,5,7,10],
+  blues:[0,3,5,6,7,10],dorian:[0,2,3,5,7,9,10],mixolydian:[0,2,4,5,7,9,10]
+};
+const SCALE_NAMES={major:'メジャースケール',minor:'ナチュラルマイナー',penta_maj:'メジャーペンタトニック',penta_min:'マイナーペンタトニック',blues:'ブルーススケール',dorian:'ドリアン',mixolydian:'ミクソリディアン'};
+
+function rand(a){return a[Math.floor(Math.random()*a.length)]}
+function noteAt(str,fret){ return NOTES[(STRINGS[5-str]+fret)%12]; }
+
+let noteTarget='C';
+const Q={
+  note:{cells:{},judged:false,active:null,stat:{perfect:0,attempt:0}},
+  scale:{cells:{},judged:false,active:null,stat:{perfect:0,attempt:0},tones:[],started:false},
+  fill:{cells:{},judged:false,active:null,stat:{perfect:0,attempt:0}}
+};
+
+function switchTab(id,btn){
+  document.querySelectorAll('.sec').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('sec-'+id).classList.add('active');
+  btn.classList.add('active');
+}
+
+function setNoteMode(mode,btn){
+  document.getElementById('notemode-search').classList.toggle('active',mode==='search');
+  document.getElementById('notemode-fill').classList.toggle('active',mode==='fill');
+  document.getElementById('note-search-panel').style.display=mode==='search'?'block':'none';
+  document.getElementById('note-fill-panel').style.display=mode==='fill'?'block':'none';
+}
+
+function isTarget(mode,note){
+  if(mode==='note') return note===noteTarget;
+  if(mode==='fill') return true;
+  return Q.scale.tones.includes(note);
+}
+
+function isPickerMode(mode){ return mode==='fill'; }
+
+function buildGrid(mode){
+  const st=Q[mode];
+  const wrap=document.getElementById(mode+'-fb');
+  const canPlay = mode==='scale' ? st.started : true;
+  const picker = isPickerMode(mode);
+  let html='<table class="fb-table"><tr><th></th>';
+  for(let f=1;f<=FRETS;f++) html+=`<th>${f}</th>`;
+  html+='</tr>';
+  for(let s=0;s<6;s++){
+    html+=`<tr><td class="str-label">${STR_NAMES[s]}</td>`;
+    for(let f=1;f<=FRETS;f++){
+      const key=`${s}-${f}`;
+      const cell=st.cells[key];
+      let cls='fb-cell';
+      let label='';
+      if(cell && cell.status){
+        cls+=' '+cell.status;
+        label=cell.note||'';
+      }else if(picker && st.active===key){
+        cls+=' sel';
+      }else if(!picker && cell && cell.sel){
+        cls+=' sel';
+      }
+      const clickable = picker ? (canPlay && !st.judged && !cell) : (canPlay && !st.judged);
+      if(!clickable) cls+=' locked';
+      html+=`<td><div class="${cls}"${clickable?` onclick="onCellClick('${mode}','${key}')"`:''}>${label}</div></td>`;
+    }
+    html+='</tr>';
+  }
+  html+='</table>';
+  wrap.innerHTML=html;
+}
+
+function onCellClick(mode,key){
+  const st=Q[mode];
+  if(st.judged) return;
+  if(mode==='scale' && !st.started) return;
+  if(isPickerMode(mode)){
+    if(st.cells[key]) return;
+    st.active=key;
+    buildGrid(mode);
+    showPicker(mode,key);
+  }else{
+    const c=st.cells[key]||{};
+    c.sel=!c.sel;
+    st.cells[key]=c;
+    buildGrid(mode);
+    updateLiveStats(mode);
+  }
+}
+
+function showPicker(mode,key){
+  const [s,f]=key.split('-').map(Number);
+  document.getElementById(mode+'-picker-label').textContent=`${STR_NAMES[s]} ${f}フレット — 音名を選んでください`;
+  const btns=document.getElementById(mode+'-picker-btns');
+  btns.innerHTML=NOTES.map(n=>`<button class="npbtn${n.includes('#')?' sharp':''}" onclick="pickNote('${mode}','${n}')">${n}</button>`).join('')
+    +`<button class="npbtn cancel" onclick="cancelPick('${mode}')">キャンセル</button>`;
+  document.getElementById(mode+'-picker').style.display='block';
+}
+
+function hidePicker(mode){
+  if(!isPickerMode(mode)) return;
+  document.getElementById(mode+'-picker').style.display='none';
+}
+
+function cancelPick(mode){
+  Q[mode].active=null;
+  hidePicker(mode);
+  buildGrid(mode);
+}
+
+function pickNote(mode,note){
+  const st=Q[mode];
+  const key=st.active;
+  if(!key)return;
+  const [s,f]=key.split('-').map(Number);
+  const actual=noteAt(s,f);
+  const ok=(note===actual)&&isTarget(mode,actual);
+  st.cells[key]={status:ok?'correct':'wrong',note};
+  st.active=null;
+  hidePicker(mode);
+  buildGrid(mode);
+  updateLiveStats(mode);
+}
+
+function countTargets(mode){
+  let total=0;
+  for(let s=0;s<6;s++)for(let f=1;f<=FRETS;f++){
+    if(isTarget(mode,noteAt(s,f))) total++;
+  }
+  return total;
+}
+
+function updateLiveStats(mode){
+  const st=Q[mode];
+  const el=document.getElementById(mode+'-progress');
+  if(isPickerMode(mode)){
+    const total=countTargets(mode);
+    let found=0,wrong=0;
+    Object.values(st.cells).forEach(c=>{ if(c.status==='correct')found++; else if(c.status==='wrong')wrong++; });
+    el.textContent=`正解 ${found} / 全${total}箇所　誤答 ${wrong}回`;
+  }else{
+    const selCount=Object.values(st.cells).filter(c=>c.sel).length;
+    el.textContent=selCount?`選択中: ${selCount} マス`:'';
+  }
+}
+
+function resetAttempts(mode){
+  const st=Q[mode];
+  if(mode==='scale' && !st.started) return;
+  st.cells={};
+  st.judged=false;
+  st.active=null;
+  hidePicker(mode);
+  document.getElementById(mode+'-result').innerHTML='';
+  buildGrid(mode);
+  updateLiveStats(mode);
+}
+
+function finalizeJudge(mode){
+  const st=Q[mode];
+  if(st.judged) return;
+  if(mode==='scale' && !st.started) return;
+  st.judged=true;
+  st.active=null;
+  hidePicker(mode);
+  const picker=isPickerMode(mode);
+  let total=0,found=0,wrong=0;
+  for(let s=0;s<6;s++){
+    for(let f=1;f<=FRETS;f++){
+      const key=`${s}-${f}`;
+      const n=noteAt(s,f);
+      const cell=st.cells[key];
+      const tgt=isTarget(mode,n);
+      if(picker){
+        if(cell&&cell.status==='wrong') wrong++;
+        if(tgt){
+          total++;
+          if(cell&&cell.status==='correct'){ found++; }
+          else{ st.cells[key]={status:'missed',note:n}; }
+        }
+      }else{
+        const selected=cell&&cell.sel;
+        if(tgt){
+          total++;
+          if(selected){ found++; st.cells[key]={status:'correct',note:n}; }
+          else{ st.cells[key]={status:'missed',note:n}; }
+        }else if(selected){
+          wrong++; st.cells[key]={status:'wrong',note:n};
+        }
+      }
+    }
+  }
+  const missed=total-found;
+  st.stat.attempt++;
+  const perfect=(missed===0 && wrong===0);
+  if(perfect)st.stat.perfect++;
+  document.getElementById(mode+'-perfect').textContent=st.stat.perfect;
+  document.getElementById(mode+'-attempt').textContent=st.stat.attempt;
+  const verb=mode==='fill'?'埋め':'見つけ';
+  let cls,label,detail;
+  if(perfect){cls='perfect';label='🎉 パーフェクト！';detail=mode==='fill'?`指板 ${total} マス、全部正しく埋められました！`:`該当箇所は指板上に ${total} 箇所ありました。全部見つけました！`;}
+  else if(missed===0){cls='ok';label=`✓ 全部${verb}ました（誤答あり）`;detail=`正解 ${total}箇所 / 誤答 ${wrong}回`;}
+  else{cls='ng';label='✗ 見逃しがあります';detail=`正解 ${total}箇所中 ${found}箇所${verb} / 見逃し ${missed}箇所 / 誤答 ${wrong}回`;}
+  document.getElementById(mode+'-result').innerHTML=`<div class="result-banner ${cls}"><span class="rlabel">${label}</span>${detail}</div>`;
+  document.getElementById(mode+'-progress').textContent='';
+  buildGrid(mode);
+}
+
+// ===== 音さがし =====
+function nextNoteQ(){
+  noteTarget=rand(NOTES);
+  Q.note.cells={};
+  Q.note.judged=false;
+  Q.note.active=null;
+  document.getElementById('note-target').textContent=noteTarget;
+  document.getElementById('note-result').innerHTML='';
+  hidePicker('note');
+  buildGrid('note');
+  updateLiveStats('note');
+}
+
+// ===== スケールさがし =====
+function startScaleQ(){
+  const root=document.getElementById('scale-key-sel').value;
+  const sk=document.getElementById('scale-type-sel').value;
+  const ri=NOTES.indexOf(root);
+  Q.scale.tones=SCALES[sk].map(s=>NOTES[(ri+s)%12]);
+  Q.scale.cells={};
+  Q.scale.judged=false;
+  Q.scale.active=null;
+  Q.scale.started=true;
+  document.getElementById('scale-qtext').innerHTML=`<span class="hl">${root} ${SCALE_NAMES[sk]}</span> の構成音をすべてクリックしてください`;
+  document.getElementById('scale-qhint').textContent=`構成音: ${Q.scale.tones.join(' ')}（${Q.scale.tones.length}音）。これだと思うマスをクリックして選択(青)。選び終わったら「答え合わせ」を押してください。`;
+  document.getElementById('scale-result').innerHTML='';
+  buildGrid('scale');
+  updateLiveStats('scale');
+}
+
+nextNoteQ();
+buildGrid('scale');
+buildGrid('fill');
+updateLiveStats('fill');
+</script>
+</body>
+</html>
