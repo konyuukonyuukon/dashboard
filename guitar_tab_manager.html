@@ -198,6 +198,10 @@ body{font-family:'Yu Gothic UI',-apple-system,BlinkMacSystemFont,'Segoe UI',sans
   <button class="toolbar-btn tb-default" onclick="toggleImagesSidebar()">&#x1f4f7; 画像</button>
   <button class="toolbar-btn tb-default" onclick="toggleChordsSidebar()">&#x1f3b5; コード表</button>
   <div class="toolbar-sep"></div>
+  <button class="toolbar-btn tb-default" onclick="exportAllData()">&#x1f4e6; 全データ書き出し</button>
+  <button class="toolbar-btn tb-default" onclick="document.getElementById('import-file-input').click()">&#x1f4c2; 全データ読み込み</button>
+  <input type="file" id="import-file-input" accept="application/json" style="display:none" onchange="if(this.files[0]) importAllData(this.files[0]); this.value='';">
+  <div class="toolbar-sep"></div>
   <button class="toolbar-btn tb-red" onclick="deleteSong()">&#x1f5d1; 曲を削除</button>
   <div class="search-box">
     <span style="font-size:12px;color:var(--text3)">検索:</span>
@@ -628,6 +632,47 @@ function exportText() {
   a.click();
   URL.revokeObjectURL(url);
   setStatus('テキスト出力しました');
+}
+
+function exportAllData() {
+  const blob = new Blob([JSON.stringify(songs, null, 2)], { type: 'application/json;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'guitar_tab_manager_backup_' + new Date().toISOString().slice(0, 10) + '.json';
+  a.click();
+  URL.revokeObjectURL(url);
+  setStatus('全データを書き出しました（画像含む）');
+}
+
+function importAllData(file) {
+  const reader = new FileReader();
+  reader.onload = () => {
+    let imported;
+    try {
+      imported = JSON.parse(reader.result);
+      if (!Array.isArray(imported)) throw new Error('not an array');
+    } catch (e) {
+      alert('読み込みに失敗しました。書き出し機能で作成したJSONファイルを選択してください。');
+      return;
+    }
+    if (!confirm(`${imported.length} 曲を読み込みます。既存の曲リストの末尾に追加されます（上書きはされません）。よろしいですか？`)) return;
+    const existingIds = new Set(songs.map(s => s.id));
+    imported.forEach(s => {
+      if (!s.id || existingIds.has(s.id)) {
+        s.id = Date.now().toString(36) + Math.random().toString(36).slice(2);
+      }
+      existingIds.add(s.id);
+      if (!s.images) s.images = [];
+      if (!s.chords) s.chords = [];
+      songs.push(s);
+    });
+    persistSongs();
+    renderSongList();
+    setStatus(imported.length + ' 曲を読み込みました');
+  };
+  reader.onerror = () => alert('ファイルの読み込みに失敗しました。');
+  reader.readAsText(file);
 }
 
 let lightboxIdx = null;
